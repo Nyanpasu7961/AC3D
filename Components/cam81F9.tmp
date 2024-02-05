@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpttb8mnxrlhj"]
+
+[ext_resource type="Script" path="res://Components/CameraComp.gd" id="1_4q6xr"]
+
+[node name="CameraComp" type="Node3D"]
+script = ExtResource("1_4q6xr")
+rot_displacement = 0.393
+rot_granularity = 5
+
+[node name="ACamera" type="Camera3D" parent="."]
+transform = Transform3D(-0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, 0.353553, -0.612372, 2, 2, -2)

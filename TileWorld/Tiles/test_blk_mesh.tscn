@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bnyohlbjvq5g7"]
+
+[ext_resource type="PackedScene" uid="uid://c61v0m7u0ttjg" path="res://TileWorld/Tiles/BaseBlock.tscn" id="1_76n8r"]
+
+[node name="TestBlkMesh" type="Node3D"]
+
+[node name="BaseBlock" parent="." instance=ExtResource("1_76n8r")]

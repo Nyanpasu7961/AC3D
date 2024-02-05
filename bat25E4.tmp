@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3 uid="uid://by053wd7k1rvj"]
+
+[ext_resource type="Script" path="res://BattleScene.gd" id="1_0vlf7"]
+[ext_resource type="Script" path="res://Services/NavService.gd" id="2_gwmk8"]
+[ext_resource type="PackedScene" uid="uid://b2d6v2gar3raa" path="res://grid_map.tscn" id="2_utyr3"]
+[ext_resource type="Script" path="res://CombatService.gd" id="3_6djkd"]
+[ext_resource type="PackedScene" uid="uid://bkmpi4m63h40d" path="res://Unit.tscn" id="3_nq6xp"]
+[ext_resource type="PackedScene" uid="uid://bw27smvokg0rp" path="res://camera_move.tscn" id="6_w0s2y"]
+
+[node name="BattleLevel" type="Node"]
+script = ExtResource("1_0vlf7")
+
+[node name="Services" type="Node" parent="."]
+
+[node name="NavService" type="Node" parent="Services"]
+script = ExtResource("2_gwmk8")
+
+[node name="CombatService" type="Node" parent="Services"]
+script = ExtResource("3_6djkd")
+
+[node name="Environment" type="Node" parent="."]
+
+[node name="HighlightHandler" type="Node3D" parent="Environment"]
+
+[node name="BattleMap" parent="Environment" instance=ExtResource("2_utyr3")]
+
+[node name="CameraMove" parent="." instance=ExtResource("6_w0s2y")]
+
+[node name="UnitHolder" type="Node3D" parent="."]
+
+[node name="Unit" parent="UnitHolder" instance=ExtResource("3_nq6xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.77096, 2.58992)
+
+[editable path="Environment/BattleMap"]
+[editable path="CameraMove"]
+[editable path="CameraMove/CameraComp"]

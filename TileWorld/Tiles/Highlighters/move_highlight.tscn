@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://coohsqp276pji"]
+
+[ext_resource type="PackedScene" uid="uid://cokldjeirnt0k" path="res://TileWorld/Tiles/Highlighters/base_highlighter.tscn" id="1_0xm55"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k1p06"]
+transparency = 1
+albedo_color = Color(0, 0.560784, 0.858824, 0.74902)
+
+[node name="MoveHighlight" instance=ExtResource("1_0xm55")]
+surface_material_override/0 = SubResource("StandardMaterial3D_k1p06")
