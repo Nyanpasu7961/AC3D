@@ -23,8 +23,7 @@ func _process(delta):
 	
 	if mouse_tile: battle_map.set_hover(mouse_tile)
 	
-	if $NavService.tiles_obtained:
-		$CombatService.turn_start($UnitHolder/Unit)
+	$CombatService.turn_start($UnitHolder/Unit)
 	#battle_map.set_movement_high([mouse_tile])
 
 

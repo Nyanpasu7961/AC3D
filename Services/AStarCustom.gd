@@ -18,7 +18,7 @@ func get_pointid(tile : Vector3i) -> int:
 
 func get_all_points(ta : Array):
 	ta = ta.map(get_pointid)
-	print(ta)
+	#print(ta)
 	return ta
 	
 func disable_pt(tile : Vector3i):
@@ -35,5 +35,5 @@ func enable_all_disable():
 func get_path(v1 : Vector3i, v2 : Vector3i) -> PackedVector3Array:
 	var id1 = get_pointid(v1)
 	var id2 = get_pointid(v2)
-	print(v1, v2)
+	#print(v1, v2)
 	return get_point_path(id1, id2)

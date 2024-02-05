@@ -34,3 +34,5 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
 omni_range = 10.0
+
+[node name="BorderMap" type="GridMap" parent="."]

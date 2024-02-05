@@ -6,35 +6,20 @@ extends Node
 var _astar_map = AStarCustom.new()
 var _path : PackedVector3Array
 
-var nav_cells = []
+var nav_cells
 var max_height
 
-var tiles_obtained = false
 var current_unit : Unit
 
 var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 
 func _ready():
-	get_viewable_tiles()
+	nav_cells = battle_map.get_viewable_tiles()
+	max_height = battle_map.max_height
 	initialise_astar()
 	
-	battle_map.nav_cells = nav_cells
-
-func sort_y_descend(a, b):
-	return a.y > b.y
-
 func manhattan_xz(a, b):
 	return abs(a.x - b.x) + abs(a.z - b.z)
-
-func get_viewable_tiles():
-	if tiles_obtained: return
-	var cells = battle_map.get_used_cells().map(func (x): return x + Vector3i.UP)
-	cells.sort_custom(sort_y_descend)
-	nav_cells = cells.filter(func (x): return (x + Vector3i.UP) not in cells)
-	tiles_obtained = true
-	
-	# Obtain maximum height of the map.
-	max_height = cells[0].y
 	
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
@@ -44,11 +29,8 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 	var jr = unit.move_comp.jump_range
 	
 	# Grab all tiles within unit's move_range and jump_range
-	var avail_tiles = nav_cells.filter(func (a): return inverted != ((abs(a.y - tsc.y) <= jr) and ((manhattan_xz(a, tsc) <= mr))) )
+	var avail_tiles = nav_cells.filter(func (a): return inverted != ((abs(a.y - tsc.y) <= jr) and ((manhattan_xz(a, tsc) <= mr))))
 	return avail_tiles
-
-#func get_tile_xz(xz_vector : Vector3):
-	
 
 func initialise_astar():
 	var tile_no = nav_cells.size()
@@ -89,10 +71,6 @@ func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
 	_path = _astar_map.get_path(unit.unit_cell, pos)
 	if _path.is_empty(): return []
 	
-	
 	unit.path_stack = _path
 	unit._next_point = _path[0]
 	return _path
-
-func _process(delta):
-	pass
