@@ -4,8 +4,8 @@ extends CharacterBody3D
 @export var move_comp : MoveComponent
 
 const SPEED = 5.0
-const AUTO_SPEED = 5.0
-const JUMP_VELOCITY = 5.0
+const AUTO_SPEED = 8.0
+const JUMP_VELOCITY = 2.8
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -24,7 +24,6 @@ var grab_next_vel = true
 var path_stack : PackedVector3Array
 var is_moving = false
 var _next_point = Vector3()
-var travel_dir : Vector3
 const ARRIVE_DISTANCE = 0.2
 
 func _ready():
@@ -32,8 +31,7 @@ func _ready():
 	ts_cell = battle_map.local_to_map(global_position)
 
 func _process(delta):
-	if grab_next_vel:
-		unit_cell = battle_map.local_to_map(global_position)
+	if grab_next_vel: unit_cell = battle_map.local_to_map(global_position)
 
 func path_movement(delta):
 	is_moving = true
@@ -47,24 +45,25 @@ func path_movement(delta):
 			return
 		_next_point = path_stack[0]
 
+
 func _move_to(local_position, delta):
 	# Move only in terms of the xz directions.
 	var desired_velocity = local_position - unit_cell
 	grab_next_vel = false
 	
 	desired_velocity = (desired_velocity.project(Vector3.BACK)+desired_velocity.project(Vector3.RIGHT)).normalized()
-	desired_velocity = desired_velocity*AUTO_SPEED*log(path_stack.size()+1)
+	desired_velocity = desired_velocity*AUTO_SPEED/(1+5*exp(-path_stack.size()))
 	velocity.x = desired_velocity.x
 	velocity.z = desired_velocity.z
 	
 	var adjusted_pos : Vector3 = global_position
-	adjusted_pos.y = battle_map.local_to_map(global_position).y
 	adjusted_pos = translate_grid_center(adjusted_pos, false)
+	# TODO: ONLY A TEMP FIX
+	adjusted_pos.y = local_position.y
 	
 	return adjusted_pos.distance_to(local_position) <= ARRIVE_DISTANCE
 
 func check_input():
-	if is_moving: return
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -94,11 +93,11 @@ func _physics_process(delta):
 		var collide = get_last_slide_collision()
 		var normal = collide.get_normal()
 		if normal in DIRECTIONS:
-			velocity.y += JUMP_VELOCITY
+			global_position.y += cell_size.y/6
 	
 	# Add the gravity.
-	if not is_on_floor():
-		velocity.y -= 10*gravity*delta
+	elif not is_on_floor(): velocity.y -= 10*gravity*delta
+	else: velocity.y = 0
 	
 func translate_grid_center(cell : Vector3, grab_center : bool = true):
 	var t_vec = Vector3(cell_size.x/2, 0, cell_size.z/2)

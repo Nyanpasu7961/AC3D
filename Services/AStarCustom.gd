@@ -21,6 +21,7 @@ func get_all_points(ta : Array):
 	#print(ta)
 	return ta
 	
+
 func disable_pt(tile : Vector3i):
 	var id = get_pointid(tile)
 	#if id in disabled_ids: return

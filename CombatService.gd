@@ -12,6 +12,7 @@ func increment_clocktime():
 func turn_start(unit : Unit):
 	if !obtained_move:
 		var reach_tiles : Array = nav_serve.get_reachable_tiles(unit)
+		print(reach_tiles)
 		battle_map.set_movement_high(reach_tiles)
 		obtained_move = true
 	
