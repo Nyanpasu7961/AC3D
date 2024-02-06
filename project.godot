@@ -39,3 +39,4 @@ select_tile={
 [layer_names]
 
 3d_physics/layer_1="Walls"
+3d_physics/layer_2="Border"

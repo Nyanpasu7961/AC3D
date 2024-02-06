@@ -9,3 +9,5 @@ static func create_material(color, texture=null, shaded_mode=0):
 	material.albedo_texture = texture
 	material.shading_mode = shaded_mode
 	return material
+
+

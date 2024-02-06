@@ -6,17 +6,32 @@ extends Node
 var _astar_map = AStarCustom.new()
 var _path : PackedVector3Array
 
-var nav_cells
-var max_height
+var nav_cells : Array
+var max_height : int
+var min_height : int
 
 var current_unit : Unit
 
 var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 
 func _ready():
-	nav_cells = battle_map.get_viewable_tiles()
-	max_height = battle_map.max_height
+	nav_cells = get_viewable_tiles()
 	initialise_astar()
+
+func sort_y_descend(a, b):
+	return a.y > b.y
+
+func get_viewable_tiles():
+	var cells = battle_map.get_used_cells().map(func (x): return x + Vector3i.UP)
+	cells.sort_custom(sort_y_descend)
+	
+	# Remove tiles that have a block above them.
+	nav_cells = cells.filter(func (x): return (x + Vector3i.UP) not in cells)
+	max_height = cells[0].y
+	min_height = cells[cells.size()-1].y
+	
+	battle_map.nav_cells = nav_cells
+	return nav_cells
 
 # Recursive flood fill algorithm
 func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int, steps : int):
@@ -80,6 +95,48 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 		return invert_tiles
 	
 	return unique_tiles
+
+
+func get_border(avail_tiles : Array, unit : Unit):
+	var move_range = unit.move_comp.move_range
+	var jump_range = unit.move_comp.jump_range
+	
+	var border_max = unit.unit_cell + Vector3(move_range, jump_range, move_range)
+	var border_min = unit.unit_cell - Vector3(move_range, jump_range, move_range)
+	
+	var unique_borders = []
+	
+	for t in avail_tiles:
+		for dir in DIRECTIONSi:
+			var new_t = t + dir
+			
+			if new_t in avail_tiles:
+				continue
+			if new_t in unique_borders:
+				continue
+			
+			var tile_below = false
+			
+			for h in range(new_t.y, border_min.y, -1):
+				var check_t = Vector3i(new_t.x, h, new_t.z)
+				
+				if check_t in avail_tiles:
+					tile_below = true
+					break
+			
+			if tile_below: continue
+			
+			for h in range(border_min.y, border_max.y+2):
+				new_t.y = h
+				print(new_t)
+				unique_borders.append(new_t)
+	
+	for x in range(border_min.x, border_max.x+1):
+		for z in range(border_min.z, border_max.z+1):
+			unique_borders.append(Vector3i(x, border_min.y, z))
+			unique_borders.append(Vector3i(x, border_max.y+2, z))
+			
+	return unique_borders
 
 func initialise_astar():
 	var tile_no = nav_cells.size()

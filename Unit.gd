@@ -92,11 +92,15 @@ func _physics_process(delta):
 	if move_and_slide():
 		var collide = get_last_slide_collision()
 		var normal = collide.get_normal()
+		
 		if normal in DIRECTIONS:
-			global_position.y += cell_size.y/6
+			global_position.y += cell_size.y/8
+		elif normal == Vector3.DOWN:
+			global_position.y -= cell_size.y/8
 	
 	# Add the gravity.
-	elif not is_on_floor(): velocity.y -= 10*gravity*delta
+	elif not is_on_floor(): 
+		velocity.y -= 5*gravity*delta
 	else: velocity.y = 0
 	
 func translate_grid_center(cell : Vector3, grab_center : bool = true):
