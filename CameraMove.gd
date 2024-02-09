@@ -6,11 +6,20 @@ var rot_displacement = PI/4
 const MOVE_SPEED = 16
 const ROT_SPEED = 10
 
+const RAY_LENGTH = 1000
+
 # Holds rotation in radians
 var x_rot
 var y_rot
 
+@export var fov_step : float
+@export var min_fov : float
+@export var max_fov : float
+
+var desired_fov : float
+
 @onready var pivot = $CameraComp
+@onready var camera = $CameraComp/ACamera
 
 # Used if player wants to move camera freely.
 var move_mode = false
@@ -19,9 +28,22 @@ var move_mode = false
 var target : Unit = null
 
 func _ready():
+	desired_fov = camera.fov
+	
 	var rot = pivot.get_rotation()
 	x_rot = rot.x
 	y_rot = rot.y
+
+func camera_zoom(event):
+	if event.is_action("zoom_in"):
+		desired_fov -= fov_step
+		desired_fov = clamp(desired_fov, min_fov, max_fov)
+		camera.fov = desired_fov
+		
+	elif event.is_action("zoom_out"):
+		desired_fov += fov_step
+		desired_fov = clamp(desired_fov, min_fov, max_fov)
+		camera.fov = desired_fov
 
 func move_camera(h, v, joystick):
 	if !joystick and h == 0 and v == 0 or target: return
@@ -41,7 +63,7 @@ func rotate_camera(delta):
 	set_process_input(true)
 
 func _input(event : InputEvent):
-	
+	camera_zoom(event)
 	if event.is_action_pressed("rot_left"):
 		set_process_input(false)
 		y_rot -= rot_displacement
@@ -73,6 +95,26 @@ func follow():
 	move_and_slide()
 	vel = velocity
 
+func get_mouse_position():
+	var space_state = get_world_3d().direct_space_state
+	var mouse_pos = get_viewport().get_mouse_position()
+	
+	# TODO: Change to current unit when multiple units on map.
+	# Intersects two rays to determine mouse position.
+	# Moves origin of normal ray to mouse_pos origin to find position relative to camera.
+	var ray_origin = camera.project_ray_origin(mouse_pos)
+	var ray_end = ray_origin + camera.project_ray_normal(mouse_pos)*RAY_LENGTH
+	var params = PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
+	
+	# Exclude units from ray here.
+	params.set_collision_mask(1)
+	var ray_intersect = space_state.intersect_ray(params)
+	#print(ray_intersect)
+	# Return position onto 3d map, if tile exists.
+	if ray_intersect: 
+		return ray_intersect["position"]
+	# Else return neg vector given no tile.
+	return null
 
 func _process(delta):
 	rotate_camera(delta)

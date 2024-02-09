@@ -1,7 +1,6 @@
 class_name Utils
 extends Node
 
-
 static func create_material(color, texture=null, shaded_mode=0):
 	var material = StandardMaterial3D.new()
 	material.flags_transparent = true

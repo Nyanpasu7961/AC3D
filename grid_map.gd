@@ -12,9 +12,6 @@ var nav_cells = []
 var max_height : int
 var min_height : int
 
-# nav_cells only in (x, z)
-var map_xz_cells = []
-
 var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 
 func set_hover(tile : Vector3):
@@ -37,7 +34,6 @@ func l_transform_m(cell : Vector3) -> Vector3i:
 	var map_cell = local_to_map(cell)
 	return map_cell
 
-# Just check adj. nodes, faster than convex hull algo.
 func set_border(border_tiles : Array):
 	border_map.clear()
 	for cell in border_tiles:

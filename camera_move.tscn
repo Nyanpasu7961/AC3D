@@ -9,8 +9,14 @@
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_7pwv3")
+fov_step = 10.0
+min_fov = 30.0
+max_fov = 120.0
 
 [node name="CameraComp" parent="." instance=ExtResource("2_jbkxx")]
+
+[node name="ACamera" parent="CameraComp" index="0"]
+near = 0.872
 
 [node name="ToGetRidofWarnings" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_g421f")

@@ -33,42 +33,60 @@ func get_viewable_tiles():
 	battle_map.nav_cells = nav_cells
 	return nav_cells
 
-# Recursive flood fill algorithm
-func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int, steps : int):
-	if steps > move_range: return []
-	if tile not in nav_cells: return []
+class FloodCell:
+	var tile : Vector3i
+	var step : int
 	
-	var arr = [tile]
+	func _init(t, s):
+		tile = t
+		step = s
+
+# Iterative flood fill algorithm
+func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int):
 	
-	var blocked_height = jump_range+1
-	var block_tile = tile
+	var fc_root = FloodCell.new(tile, 0)
 	
-	# Check block min: 2 blocks above curr tile, max: max_height
-	for h in range(2, jump_range+1):
-		block_tile.y = h+tile.y
-		if block_tile in nav_cells: 
-			blocked_height = h
-			break
+	var queue = [fc_root]
+	var result : Dictionary = {}
 	
-	var to_check = []
-	for dir in DIRECTIONSi:
-		var new_tile = tile + dir
+	while not queue.is_empty():
 		
-		# Only get the highest block below the current tile.
-		for h in range(0, jump_range+1):
-			var check_vec = new_tile + h*Vector3i.DOWN
-			if check_vec in nav_cells:
-				to_check.append(check_vec)
+		var fc = queue.pop_front()
+		var curr_cell = fc.tile
+		var steps = fc.step
+		
+		if steps > move_range: continue
+		if curr_cell not in nav_cells: continue
+		
+		if result.has(curr_cell):
+			if result[curr_cell] <= steps: continue
+		
+		result[curr_cell] = steps
+		
+		var blocked_jump = min(max_height-curr_cell.y, jump_range)
+		
+		for h in range(2, blocked_jump):
+			if curr_cell + h*Vector3i.UP in nav_cells:
+				blocked_jump = h-1
 				break
 		
-		# Obtain blocks above current tile that are below the blocked height.
-		for h in range(0, blocked_height):
-			to_check.append(new_tile+h*Vector3i.UP)
+		for dir in DIRECTIONSi:
+			var new_t = curr_cell+dir
+			
+			for h in range(0, blocked_jump+1):
+				var added_cell = new_t + h*Vector3i.UP
+				var new_fc = FloodCell.new(added_cell, steps+1)
+				queue.push_back(new_fc)
+			
+			for h in range(0, -jump_range-1, -1):
+				var added_cell = new_t + h*Vector3i.UP
+				
+				if added_cell in nav_cells:
+					var new_fc = FloodCell.new(added_cell, steps+1)
+					queue.push_back(new_fc)
+					break
 	
-	for t in to_check:
-		arr.append_array(cell_flood_fill(t, move_range, jump_range, steps+1))
-	
-	return arr
+	return result.keys()
 
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
@@ -78,23 +96,16 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 	var jr = unit.move_comp.jump_range
 	
 	# Flood fill algorithm
-	var avail_tiles = cell_flood_fill(tsc, mr, jr, 0)
-	
-	var unique_tiles = []
-
-	# Check uniqueness
-	for t in avail_tiles:
-		if t not in unique_tiles: 
-			unique_tiles.append(t)
+	var avail_tiles = cell_flood_fill(tsc, mr, jr)
 	
 	if inverted:
 		var invert_tiles = []
 		for t in nav_cells:
-			if t not in unique_tiles:
+			if t not in avail_tiles:
 				invert_tiles.append(t)
 		return invert_tiles
 	
-	return unique_tiles
+	return avail_tiles
 
 
 func get_border(avail_tiles : Array, unit : Unit):
@@ -115,20 +126,20 @@ func get_border(avail_tiles : Array, unit : Unit):
 			if new_t in unique_borders:
 				continue
 			
+			# Check: given a border tile, is there a highlighted tile below it?
 			var tile_below = false
-			
 			for h in range(new_t.y, border_min.y, -1):
 				var check_t = Vector3i(new_t.x, h, new_t.z)
-				
 				if check_t in avail_tiles:
 					tile_below = true
 					break
-			
 			if tile_below: continue
 			
-			for h in range(border_min.y, border_max.y+2):
+			
+			
+			for h in range(new_t.y, border_max.y+2):
 				new_t.y = h
-				print(new_t)
+				if new_t in avail_tiles: break
 				unique_borders.append(new_t)
 	
 	for x in range(border_min.x, border_max.x+1):
@@ -139,6 +150,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 	return unique_borders
 
 func initialise_astar():
+	
 	var tile_no = nav_cells.size()
 	_astar_map.reserve_space(tile_no)
 
@@ -179,6 +191,7 @@ func initialise_astar():
 				if !_astar_map.has_point(id2): continue
 				_astar_map.connect_points(id, id2)
 				break
+		
 
 func astar_reachable_tiles(unit : Unit):
 	# Re-enable all previously disabled tiles.
@@ -194,11 +207,15 @@ func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
 		astar_reachable_tiles(unit)
 		current_unit = unit
 	
+	unit.unit_cell = battle_map.local_to_map(unit.global_position)
+	
 	# Need to translate down given block position i.e. block is placed above grid.
 	_path = _astar_map.get_path(unit.unit_cell, pos)
 	print(_path)
 	if _path.is_empty(): return []
 	
+	
 	unit.path_stack = _path
 	unit._next_point = _path[0]
+	
 	return _path

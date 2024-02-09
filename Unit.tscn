@@ -16,12 +16,13 @@ move_comp = NodePath("MEC")
 transform = Transform3D(0.325, 0, 0, 0, 0.325, 0, 0, 0, 0.325, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_h2hqc")
 
-[node name="MEC2" type="Sprite3D" parent="."]
+[node name="Sprite3D" type="Sprite3D" parent="."]
 sorting_offset = 10.0
 billboard = 1
 render_priority = 127
 texture = ExtResource("1_sybe8")
 
 [node name="MEC" parent="." instance=ExtResource("4_nc1tp")]
+TIME_TO_FALL = 0.4
 
 [editable path="MEC"]
