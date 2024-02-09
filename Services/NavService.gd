@@ -127,15 +127,16 @@ func get_border(avail_tiles : Array, unit : Unit):
 				continue
 			
 			# Check: given a border tile, is there a highlighted tile below it?
+			# Stop
 			var tile_below = false
 			for h in range(new_t.y, border_min.y, -1):
 				var check_t = Vector3i(new_t.x, h, new_t.z)
 				if check_t in avail_tiles:
 					tile_below = true
 					break
+				if check_t in nav_cells:
+					break
 			if tile_below: continue
-			
-			
 			
 			for h in range(new_t.y, border_max.y+2):
 				new_t.y = h
@@ -148,6 +149,9 @@ func get_border(avail_tiles : Array, unit : Unit):
 			unique_borders.append(Vector3i(x, border_max.y+2, z))
 			
 	return unique_borders
+
+func grab_skill_area(unit : Unit, skill):
+	return cell_flood_fill(unit.unit_cell, skill.range, skill.h_range)
 
 func initialise_astar():
 	
@@ -213,7 +217,6 @@ func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
 	_path = _astar_map.get_path(unit.unit_cell, pos)
 	print(_path)
 	if _path.is_empty(): return []
-	
 	
 	unit.path_stack = _path
 	unit._next_point = _path[0]

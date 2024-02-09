@@ -20,6 +20,7 @@ var desired_fov : float
 
 @onready var pivot = $CameraComp
 @onready var camera = $CameraComp/ACamera
+@onready var ray :RayCast3D = $CameraComp/ACamera/CameraRay
 
 # Used if player wants to move camera freely.
 var move_mode = false
@@ -34,6 +35,19 @@ func _ready():
 	x_rot = rot.x
 	y_rot = rot.y
 
+func _input(event : InputEvent):
+	camera_zoom(event)
+	camera_rot(event)
+
+func _process(delta):
+	rotate_camera(delta)
+	follow()
+	
+	#if ray.is_colliding():
+	#	print(ray.get_collision_point())
+	#else:
+	#	print("no")
+
 func camera_zoom(event):
 	if event.is_action("zoom_in"):
 		desired_fov -= fov_step
@@ -43,7 +57,23 @@ func camera_zoom(event):
 	elif event.is_action("zoom_out"):
 		desired_fov += fov_step
 		desired_fov = clamp(desired_fov, min_fov, max_fov)
-		camera.fov = desired_fov
+		camera.fov = desired_fov	
+
+func camera_rot(event):
+	if event.is_action_pressed("rot_left"):
+		set_process_input(false)
+		y_rot -= rot_displacement
+		
+		if y_rot < 0:
+			y_rot += 2*PI
+			pivot.rotation.y += 2*PI
+		
+	elif event.is_action_pressed("rot_right"):
+		set_process_input(false)
+		y_rot += rot_displacement
+		if y_rot > 2*PI:
+			y_rot -= 2*PI
+			pivot.rotation.y -= 2*PI
 
 func move_camera(h, v, joystick):
 	if !joystick and h == 0 and v == 0 or target: return
@@ -61,24 +91,6 @@ func rotate_camera(delta):
 	var dst_r = Vector3(x_rot, y_rot, 0)
 	pivot.set_rotation(curr_r.lerp(dst_r, ROT_SPEED*delta))
 	set_process_input(true)
-
-func _input(event : InputEvent):
-	camera_zoom(event)
-	if event.is_action_pressed("rot_left"):
-		set_process_input(false)
-		y_rot -= rot_displacement
-		
-		if y_rot < 0:
-			y_rot += 2*PI
-			pivot.rotation.y += 2*PI
-		
-	elif event.is_action_pressed("rot_right"):
-		set_process_input(false)
-		y_rot += rot_displacement
-		if y_rot > 2*PI:
-			y_rot -= 2*PI
-			pivot.rotation.y -= 2*PI
-
 
 func follow():
 	if move_mode or !target: return
@@ -99,7 +111,6 @@ func get_mouse_position():
 	var space_state = get_world_3d().direct_space_state
 	var mouse_pos = get_viewport().get_mouse_position()
 	
-	# TODO: Change to current unit when multiple units on map.
 	# Intersects two rays to determine mouse position.
 	# Moves origin of normal ray to mouse_pos origin to find position relative to camera.
 	var ray_origin = camera.project_ray_origin(mouse_pos)
@@ -109,13 +120,9 @@ func get_mouse_position():
 	# Exclude units from ray here.
 	params.set_collision_mask(1)
 	var ray_intersect = space_state.intersect_ray(params)
-	#print(ray_intersect)
 	# Return position onto 3d map, if tile exists.
-	if ray_intersect: 
-		return ray_intersect["position"]
+	if ray_intersect: return ray_intersect["position"]
 	# Else return neg vector given no tile.
 	return null
 
-func _process(delta):
-	rotate_camera(delta)
-	follow()
+

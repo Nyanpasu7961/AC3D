@@ -13,6 +13,8 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var battle_map : GridMap = $"../../Environment/BattleMap"
 @onready var nav_serve = $"../../NavService"
 
+var is_active = false
+
 var map_id
 
 var DIRECTIONS = [Vector3.FORWARD, Vector3.BACK, Vector3.RIGHT, Vector3.LEFT]
@@ -26,7 +28,7 @@ var grab_next_vel = true
 var path_stack : PackedVector3Array
 var is_moving = false
 var _next_point = Vector3()
-const ARRIVE_DISTANCE = 0.1
+const ARRIVE_DISTANCE = 0.3
 
 var height_scale : float = 1
 
@@ -58,12 +60,14 @@ func _move_to(local_position, delta):
 	
 	# TODO: Remove if you can solve vel.x, vel.z when jumping.
 	
-	
 	# Move only in terms of the xz directions.
 	var desired_velocity = local_position - unit_cell
 	
 	# y component velocity
 	if desired_velocity.y > 0 and is_on_floor():
+		unit_cell = battle_map.local_to_map(global_position)
+		desired_velocity = local_position - unit_cell
+		
 		height_scale = ((desired_velocity.y+1)/move_comp.jump_height)
 		velocity.y = move_comp.jump_vel*height_scale
 		velocity.x = 0
@@ -82,7 +86,7 @@ func _move_to(local_position, delta):
 	var adjusted_pos : Vector3 = global_position
 	adjusted_pos = translate_grid_center(adjusted_pos, false)
 	# TODO: ONLY A TEMP FIX
-	adjusted_pos.y = local_position.y
+	adjusted_pos.y = floor(adjusted_pos.y)
 	
 	return adjusted_pos.distance_to(local_position) <= ARRIVE_DISTANCE
 
@@ -108,11 +112,12 @@ func check_input():
 	
 
 func _physics_process(delta):
+	if !is_active: return
+	
 	if !path_stack.is_empty():
 		path_movement(delta)
 	
 	if !is_moving:
-		
 		check_input()
 	
 	if velocity.x == 0 and velocity.z == 0: 

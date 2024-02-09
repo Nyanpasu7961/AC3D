@@ -15,5 +15,6 @@ func turn_start(unit : Unit):
 		battle_map.set_movement_high(reach_tiles)
 		battle_map.set_border(nav_serve.get_border(reach_tiles, unit))
 		obtained_move = true
+		unit.is_active = true
 	
 	

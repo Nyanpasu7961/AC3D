@@ -33,11 +33,14 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="CameraMove" parent="." instance=ExtResource("6_w0s2y")]
 
 [node name="ACamera" parent="CameraMove/CameraComp" index="0"]
-fov = 51.5
-size = 8.0
+size = 4.0
 
 [node name="UnitHolder" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.35271)
+
+[node name="Unit2" parent="UnitHolder" node_paths=PackedStringArray("move_comp") instance=ExtResource("3_nq6xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.48231, 1.34852, -0.163158)
+move_comp = NodePath("../Unit/MEC")
 
 [node name="Unit" parent="UnitHolder" instance=ExtResource("3_nq6xp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, 2.51217)
