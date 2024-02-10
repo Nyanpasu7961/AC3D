@@ -112,6 +112,9 @@ func get_border(avail_tiles : Array, unit : Unit):
 	var move_range = unit.move_comp.move_range
 	var jump_range = unit.move_comp.jump_range
 	
+	#TODO: Fix so that it uses the avail tiles instead of unit pos for border.
+	var max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b)
+	
 	var border_max = unit.unit_cell + Vector3(move_range, jump_range, move_range)
 	var border_min = unit.unit_cell - Vector3(move_range, jump_range, move_range)
 	
@@ -127,7 +130,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 				continue
 			
 			# Check: given a border tile, is there a highlighted tile below it?
-			# Stop
+			# Stop if there is nav tile on check.
 			var tile_below = false
 			for h in range(new_t.y, border_min.y, -1):
 				var check_t = Vector3i(new_t.x, h, new_t.z)

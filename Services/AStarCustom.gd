@@ -16,15 +16,9 @@ func get_pointid(tile : Vector3i) -> int:
 	id_count += 1
 	return count
 
-func get_all_points(ta : Array):
-	ta = ta.map(get_pointid)
-	#print(ta)
-	return ta
-	
-
 func disable_pt(tile : Vector3i):
 	var id = get_pointid(tile)
-	#if id in disabled_ids: return
+	if id in disabled_ids or not has_point(id): return
 	disabled_ids.append(id)
 	set_point_disabled(id)
 
@@ -36,5 +30,6 @@ func enable_all_disable():
 func get_path(v1 : Vector3i, v2 : Vector3i) -> PackedVector3Array:
 	var id1 = get_pointid(v1)
 	var id2 = get_pointid(v2)
-	#print(v1, v2)
-	return get_point_path(id1, id2)
+	if has_point(id1) and has_point(id2):
+		return get_point_path(id1, id2)
+	return []

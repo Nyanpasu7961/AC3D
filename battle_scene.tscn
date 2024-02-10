@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://BattleScene.gd" id="1_0vlf7"]
 [ext_resource type="Script" path="res://Services/NavService.gd" id="2_gwmk8"]
-[ext_resource type="PackedScene" uid="uid://b2d6v2gar3raa" path="res://grid_map.tscn" id="2_utyr3"]
-[ext_resource type="Script" path="res://CombatService.gd" id="3_6djkd"]
-[ext_resource type="PackedScene" uid="uid://bkmpi4m63h40d" path="res://Unit.tscn" id="3_nq6xp"]
-[ext_resource type="PackedScene" uid="uid://bw27smvokg0rp" path="res://camera_move.tscn" id="6_w0s2y"]
+[ext_resource type="PackedScene" uid="uid://b2d6v2gar3raa" path="res://Map/grid_map.tscn" id="2_utyr3"]
+[ext_resource type="Script" path="res://Services/CombatService.gd" id="3_6djkd"]
+[ext_resource type="PackedScene" uid="uid://bkmpi4m63h40d" path="res://Units/Unit.tscn" id="3_nq6xp"]
+[ext_resource type="PackedScene" uid="uid://bw27smvokg0rp" path="res://Camera/camera_move.tscn" id="6_w0s2y"]
 
 [node name="BattleLevel" type="Node"]
 script = ExtResource("1_0vlf7")

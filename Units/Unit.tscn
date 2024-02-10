@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bkmpi4m63h40d"]
 
 [ext_resource type="Texture2D" uid="uid://dd2pjqd3yvhw1" path="res://SpirteAssets/thronesprite.png" id="1_sybe8"]
-[ext_resource type="Script" path="res://Unit.gd" id="1_wj63i"]
+[ext_resource type="Script" path="res://Units/Unit.gd" id="1_wj63i"]
 [ext_resource type="PackedScene" uid="uid://belm50so7ukls" path="res://Components/move_entity_comp.tscn" id="4_nc1tp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_h2hqc"]

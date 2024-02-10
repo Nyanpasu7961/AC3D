@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bw27smvokg0rp"]
 
-[ext_resource type="Script" path="res://CameraMove.gd" id="1_7pwv3"]
+[ext_resource type="Script" path="res://Camera/CameraMove.gd" id="1_7pwv3"]
 [ext_resource type="PackedScene" uid="uid://bpttb8mnxrlhj" path="res://Components/camera_comp.tscn" id="2_jbkxx"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_g421f"]

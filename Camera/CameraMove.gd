@@ -20,7 +20,7 @@ var desired_fov : float
 
 @onready var pivot = $CameraComp
 @onready var camera = $CameraComp/ACamera
-@onready var ray :RayCast3D = $CameraComp/ACamera/CameraRay
+@onready var ray : RayCast3D = $CameraComp/ACamera/CameraRay
 
 # Used if player wants to move camera freely.
 var move_mode = false
