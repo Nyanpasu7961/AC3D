@@ -74,6 +74,14 @@ func camera_rot(event):
 		if y_rot > 2*PI:
 			y_rot -= 2*PI
 			pivot.rotation.y -= 2*PI
+	
+	elif event.is_action_pressed("rot_up"):
+		set_process_input(false)
+		x_rot -= rot_displacement
+	
+	elif event.is_action_pressed("rot_down"):
+		set_process_input(false)
+		x_rot += rot_displacement
 
 func move_camera(h, v, joystick):
 	if !joystick and h == 0 and v == 0 or target: return

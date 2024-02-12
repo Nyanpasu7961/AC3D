@@ -1,8 +1,10 @@
 class_name HealthComponent
 extends Node3D
 
-@onready var hp_bar : TextureProgressBar = $View/Bar
+@onready var hp_bar : TextureProgressBar = $BarViewPort/Bar
 @onready var bar_sprite : Sprite3D = $BarSprite
+
+const BAR_DISTANCE = 0.5
 
 @export var attr_comp : EntityAttrComp
 

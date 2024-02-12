@@ -42,8 +42,17 @@ func _ready():
 	unit_cell = battle_map.local_to_map(global_position)
 
 func _process(delta):
-	
+	adjust_healthbar()
 	pass
+
+func adjust_healthbar():
+	var cam_rot = camera_comp.pivot.rotation
+	var rot_x = snapped(cam_rot.x, 0.01)
+	var rot_y = snapped(cam_rot.y, 0.01)
+	
+	
+	var bar_pos = lerp(Vector3(0, health_comp.BAR_DISTANCE, 0),Vector3(0, 0, health_comp.BAR_DISTANCE), 2*rot_x/(PI))
+	health_comp.bar_sprite.position = bar_pos.rotated(Vector3.UP, rot_y)
 
 func get_gravity() -> float:
 	return height_scale*(move_comp.jump_gravity if velocity.y > 0 else move_comp.fall_gravity)
