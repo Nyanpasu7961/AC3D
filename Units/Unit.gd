@@ -10,7 +10,9 @@ const JUMP_VELOCITY = 2.0
 
 @onready var battle_map : GridMap = $"../../Environment/BattleMap"
 @onready var nav_serve = $"../../NavService"
+@onready var camera_comp = $"../../CameraMove"
 
+# Check if the currently controlled unit is this one.
 var is_active = false
 
 var map_id
@@ -28,8 +30,8 @@ var path_stack : PackedVector3Array
 var is_moving = false
 var _next_point = Vector3()
 
-# Radius of circumscribed circle in a 1/4m length square
-const ARRIVE_DISTANCE = 0.5
+# Square of length 0.1m
+const ARRIVE_DISTANCE = 0.1
 
 var height_scale : float = 1
 
@@ -40,6 +42,7 @@ func _ready():
 	unit_cell = battle_map.local_to_map(global_position)
 
 func _process(delta):
+	
 	pass
 
 func get_gravity() -> float:
@@ -81,7 +84,11 @@ func _move_to(local_position, delta):
 		velocity.z = 0
 		velocity.y += get_gravity()*delta
 	
-	return adjusted_pos.distance_to(local_position) <= ARRIVE_DISTANCE
+	#l_inf norm, returns distance in terms of a geometric square.
+	var res = adjusted_pos - local_position
+	var norm = max(abs(res.x),abs(res.z))
+	
+	return norm <= ARRIVE_DISTANCE
 
 func check_input():
 	# Get the input direction and handle the movement/deceleration.
@@ -93,7 +100,7 @@ func check_input():
 		velocity.y = move_comp.jump_vel
 	
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y))
-	direction = direction.rotated(Vector3.UP, $"../../CameraMove".y_rot)
+	direction = direction.rotated(Vector3.UP, camera_comp.y_rot)
 	direction = direction.normalized()
 	
 	if direction:

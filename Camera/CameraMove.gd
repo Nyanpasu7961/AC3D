@@ -12,9 +12,9 @@ const RAY_LENGTH = 1000
 var x_rot
 var y_rot
 
-@export var fov_step : float
-@export var min_fov : float
-@export var max_fov : float
+@export var fov_step : float = 10
+@export var min_fov : float = 30
+@export var max_fov : float = 120
 
 var desired_fov : float
 

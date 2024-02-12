@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bkmpi4m63h40d"]
+[gd_scene load_steps=6 format=3 uid="uid://bkmpi4m63h40d"]
 
-[ext_resource type="Texture2D" uid="uid://dd2pjqd3yvhw1" path="res://SpirteAssets/thronesprite.png" id="1_sybe8"]
 [ext_resource type="Script" path="res://Units/Unit.gd" id="1_wj63i"]
+[ext_resource type="PackedScene" uid="uid://dgpcw5200jy8q" path="res://Components/HealthComponent.tscn" id="2_m1dph"]
+[ext_resource type="Texture2D" uid="uid://dd2pjqd3yvhw1" path="res://SpriteAssets/thronesprite.png" id="3_2fdsa"]
 [ext_resource type="PackedScene" uid="uid://belm50so7ukls" path="res://Components/move_entity_comp.tscn" id="4_nc1tp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_h2hqc"]
@@ -12,6 +13,9 @@ collision_mask = 3
 script = ExtResource("1_wj63i")
 move_comp = NodePath("MEC")
 
+[node name="HealthComponent" parent="." instance=ExtResource("2_m1dph")]
+MAX_HP = 500.0
+
 [node name="CollisionCmp" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.325, 0, 0, 0, 0.325, 0, 0, 0, 0.325, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_h2hqc")
@@ -20,9 +24,8 @@ shape = SubResource("CapsuleShape3D_h2hqc")
 sorting_offset = 10.0
 billboard = 1
 render_priority = 127
-texture = ExtResource("1_sybe8")
+texture = ExtResource("3_2fdsa")
 
 [node name="MEC" parent="." instance=ExtResource("4_nc1tp")]
-TIME_TO_FALL = 0.4
 
 [editable path="MEC"]

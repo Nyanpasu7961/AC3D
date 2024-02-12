@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://8jkut50xi2tl"]
+
+[ext_resource type="Script" path="res://EntityAttrComp.gd" id="1_35egn"]
+
+[node name="EntityAttrComp" type="Node3D"]
+script = ExtResource("1_35egn")
