@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://b2d6v2gar3raa"]
+[gd_scene load_steps=6 format=3 uid="uid://b2d6v2gar3raa"]
 
 [ext_resource type="MeshLibrary" uid="uid://blsb1ottgv77w" path="res://TileWorld/Tiles/VisibleBlocks/base_block.tres" id="1_1fx3s"]
 [ext_resource type="Script" path="res://Map/grid_map.gd" id="2_js2qe"]
 [ext_resource type="MeshLibrary" uid="uid://v323yiokpytu" path="res://TileWorld/Tiles/Borders/border.tres" id="3_2ujc0"]
 [ext_resource type="MeshLibrary" uid="uid://0gdkm1xe0r8a" path="res://TileWorld/Tiles/Highlighters/HighlightTiles2.tres" id="3_jvci0"]
+[ext_resource type="MeshLibrary" uid="uid://bongb5lv8ajp0" path="res://TileWorld/Tiles/Highlighters/HighlightTiles.tres" id="5_d1ain"]
 
 [node name="BattleMap" type="GridMap"]
 mesh_library = ExtResource("1_1fx3s")
@@ -45,3 +46,8 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
 omni_range = 10.0
+
+[node name="SkillStuff" type="GridMap" parent="."]
+mesh_library = ExtResource("5_d1ain")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false

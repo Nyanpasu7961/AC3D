@@ -5,6 +5,8 @@ extends GridMap
 @onready var hover_high : GridMap = $HoverHighlight 
 @onready var move_high : GridMap = $MoveHighlight
 
+@onready var skill_map : GridMap = $SkillStuff
+
 const BORDER_OFFSET_Y : int = 5
 
 # Stores available tiles in use.
@@ -38,3 +40,8 @@ func set_border(border_tiles : Array):
 	border_map.clear()
 	for cell in border_tiles:
 		border_map.set_cell_item(cell, 0)
+
+func map_set_skill(tiles : Array):
+	skill_map.clear()
+	for cell in tiles:
+		skill_map.set_cell_item(l_transform_m(cell), 0)

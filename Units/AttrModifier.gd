@@ -7,7 +7,7 @@ var value_type : Utils.ValueTypes
 var duration : int
 var duration_type : Utils.DurationType
 
-var source : Object
+var source : Object = null
 
 func _tick_duration(d_type : Utils.DurationType):
 	if d_type == duration_type: 

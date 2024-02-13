@@ -5,7 +5,7 @@ extends CharacterBody3D
 @export var move_comp : MoveComponent
 
 const SPEED = 5.0
-const AUTO_SPEED = 5.0
+const AUTO_SPEED = 10.0
 const JUMP_VELOCITY = 2.0
 
 @onready var battle_map : GridMap = $"../../Environment/BattleMap"
@@ -30,8 +30,10 @@ var path_stack : PackedVector3Array
 var is_moving = false
 var _next_point = Vector3()
 
-# Square of length 0.1m
-const ARRIVE_DISTANCE = 0.1
+var tested = false
+
+# Square of length 0.25m
+const ARRIVE_DISTANCE = 0.25
 
 var height_scale : float = 1
 
@@ -50,9 +52,14 @@ func adjust_healthbar():
 	var rot_x = snapped(cam_rot.x, 0.01)
 	var rot_y = snapped(cam_rot.y, 0.01)
 	
+	#TODO: Readjust health bar position relative to the camera position.
+	# Leave to the end i guess.
+	#var rel_pos = Vector3.ZERO
+	#if !is_active:
+	#	rel_pos = (camera_comp.target_position - global_position).snapped(Vector3.ONE*0.01)
 	
-	var bar_pos = lerp(Vector3(0, health_comp.BAR_DISTANCE, 0),Vector3(0, 0, health_comp.BAR_DISTANCE), 2*rot_x/(PI))
-	health_comp.bar_sprite.position = bar_pos.rotated(Vector3.UP, rot_y)
+	var bar_pos = lerp(Vector3(0, health_comp.BAR_DISTANCE, 0),Vector3(0, 0, health_comp.BAR_DISTANCE), 2*rot_x/PI)
+	health_comp.bar_sprite.position = (bar_pos).rotated(Vector3.UP, rot_y)
 
 func get_gravity() -> float:
 	return height_scale*(move_comp.jump_gravity if velocity.y > 0 else move_comp.fall_gravity)
@@ -60,7 +67,7 @@ func get_gravity() -> float:
 func path_movement(delta):
 	var arrived_to_next_point = _move_to(_next_point, delta)
 	if arrived_to_next_point:
-		snap_to_grid()
+		force_snap_to_grid()
 		path_stack.remove_at(0)
 		unit_cell = battle_map.local_to_map(global_position)
 		if path_stack.is_empty():
@@ -80,18 +87,20 @@ func _move_to(local_position, delta):
 	# y component velocity
 	if desired_velocity.y > 0:
 		global_position.y += desired_velocity.y
-		
 		unit_cell = battle_map.local_to_map(global_position)
 	
-	#var new_vel = (desired_velocity.project(Vector3.BACK)+desired_velocity.project(Vector3.RIGHT)).normalized()
-	#new_vel *= AUTO_SPEED
-	velocity.x = desired_velocity.x*AUTO_SPEED
-	velocity.z = desired_velocity.z*AUTO_SPEED
+	var new_vel = (desired_velocity.project(Vector3.BACK)+desired_velocity.project(Vector3.RIGHT)).normalized()
+	new_vel *= AUTO_SPEED
+	velocity.x = new_vel.x
+	velocity.z = new_vel.z
 	
 	if desired_velocity.y < 0 and not is_on_floor():
 		velocity.x = 0
 		velocity.z = 0
 		velocity.y += get_gravity()*delta
+	
+	if desired_velocity.y != 0 and is_on_floor():
+		unit_cell = battle_map.local_to_map(global_position)
 	
 	#l_inf norm, returns distance in terms of a geometric square.
 	var res = adjusted_pos - local_position
@@ -140,10 +149,19 @@ func _physics_process(delta):
 	if not is_on_floor() and not is_moving: 
 		velocity.y += get_gravity()*delta
 	
+	if !is_moving:
+		unit_cell = battle_map.local_to_map(global_position)
+		tested = false
+	
 func translate_grid_center(cell : Vector3, grab_center : bool = true):
 	var t_vec = Vector3(cell_size.x/2, 0, cell_size.z/2)
 	return cell + (t_vec if grab_center else -t_vec)
-	
+
+func force_snap_to_grid():
+	var cell = battle_map.local_to_map(global_position) as Vector3
+	var to = cell+Vector3(cell_size.x/2, 0, cell_size.z/2)
+	global_position = to
+
 # Readjusts unit to grid position.
 func snap_to_grid():
 	var cell = battle_map.local_to_map(global_position) as Vector3

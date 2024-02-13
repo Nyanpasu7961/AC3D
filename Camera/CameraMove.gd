@@ -27,6 +27,7 @@ var move_mode = false
 
 # Snap screen to target unit.
 var target : Unit = null
+var target_position : Vector3
 
 func _ready():
 	desired_fov = camera.fov
@@ -88,7 +89,7 @@ func move_camera(h, v, joystick):
 	var angle = (atan2(-h, v))+pivot.get_rotation().y
 	var dir = Vector3.FORWARD.rotated(Vector3.UP, angle)
 	var vel = dir*MOVE_SPEED
-	if joystick: vel = vel*sqrt(h*h+v*v)
+	if joystick: vel = vel*sqrt(pow(h, 2)+pow(v, 2))
 	set_velocity(vel)
 	set_up_direction(Vector3.UP)
 	move_and_slide()
@@ -100,14 +101,18 @@ func rotate_camera(delta):
 	pivot.set_rotation(curr_r.lerp(dst_r, ROT_SPEED*delta))
 	set_process_input(true)
 
+func change_target(unit : Unit):
+	target = unit
+	target_position = target.global_transform.origin
+
 func follow():
 	if move_mode or !target: return
 	var from = global_transform.origin
-	var to = target.global_transform.origin
+	target_position = target.global_transform.origin
 	
-	var dist = from.distance_to(to)
+	var dist = from.distance_to(target_position)
 	
-	var vel = (to-from)*MOVE_SPEED/4
+	var vel = (target_position-from)*MOVE_SPEED/4
 	if dist <= 0.25:
 		vel = vel*4*max(dist-0.05, 0)
 	set_velocity(vel)
