@@ -10,6 +10,5 @@ var duration_type : Utils.DurationType
 var source : Object = null
 
 func _tick_duration(d_type : Utils.DurationType):
-	if d_type == duration_type: 
-		duration -= 1
+	if d_type == duration_type: duration -= 1
 	return duration <= 0

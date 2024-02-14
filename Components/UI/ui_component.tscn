@@ -1,0 +1,89 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3i8jspdnq5el"]
+
+[ext_resource type="Script" path="res://Components/UI/ui_component.gd" id="1_oq1js"]
+
+[node name="UIComponent" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_oq1js")
+
+[node name="TurnUIControl" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -319.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="AttackContainer" type="VBoxContainer" parent="TurnUIControl"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TurnUIControl/AttackContainer"]
+layout_mode = 2
+text = "LLLL"
+
+[node name="Attack" type="Button" parent="TurnUIControl/AttackContainer"]
+layout_mode = 2
+text = "Attack
+"
+
+[node name="MSkillsContainer" type="VBoxContainer" parent="TurnUIControl"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TurnUIControl/MSkillsContainer"]
+layout_mode = 2
+text = "LLLL"
+
+[node name="MSkills" type="Button" parent="TurnUIControl/MSkillsContainer"]
+layout_mode = 2
+text = "Main Skills
+"
+
+[node name="SSkillsContainer" type="VBoxContainer" parent="TurnUIControl"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TurnUIControl/SSkillsContainer"]
+layout_mode = 2
+text = "LLLL"
+
+[node name="SSkills" type="Button" parent="TurnUIControl/SSkillsContainer"]
+layout_mode = 2
+text = "Sub Skills
+"
+
+[node name="EndTurnContainer" type="VBoxContainer" parent="TurnUIControl"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TurnUIControl/EndTurnContainer"]
+layout_mode = 2
+text = "LLLL"
+
+[node name="EndTurn" type="Button" parent="TurnUIControl/EndTurnContainer"]
+layout_mode = 2
+text = "End Turn"
+
+[node name="SkillList" type="ScrollContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -20.0
+offset_bottom = 20.0
+grow_horizontal = 0
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="VScrollBar" type="VScrollBar" parent="SkillList"]
+layout_mode = 2

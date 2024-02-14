@@ -6,6 +6,7 @@ enum DurationType {NONE, TURN, CLOCKTIME}
 
 enum SkillType {PHYSICAL, MAGIC, STATUS}
 enum WeaponType {SLASH, MISSILE, STRIKE}
+enum AreaType {SQUARE, CROSS, DIAMOND}
 
 static func create_material(color, texture=null, shaded_mode=0):
 	var material = StandardMaterial3D.new()

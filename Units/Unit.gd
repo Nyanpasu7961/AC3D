@@ -3,6 +3,7 @@ extends CharacterBody3D
 
 @export var health_comp : HealthComponent
 @export var move_comp : MoveComponent
+@export var attr_comp : EntityAttrComp
 
 const SPEED = 5.0
 const AUTO_SPEED = 10.0
@@ -52,12 +53,6 @@ func adjust_healthbar():
 	var rot_x = snapped(cam_rot.x, 0.01)
 	var rot_y = snapped(cam_rot.y, 0.01)
 	
-	#TODO: Readjust health bar position relative to the camera position.
-	# Leave to the end i guess.
-	#var rel_pos = Vector3.ZERO
-	#if !is_active:
-	#	rel_pos = (camera_comp.target_position - global_position).snapped(Vector3.ONE*0.01)
-	
 	var bar_pos = lerp(Vector3(0, health_comp.BAR_DISTANCE, 0),Vector3(0, 0, health_comp.BAR_DISTANCE), 2*rot_x/PI)
 	health_comp.bar_sprite.position = (bar_pos).rotated(Vector3.UP, rot_y)
 
@@ -89,10 +84,8 @@ func _move_to(local_position, delta):
 		global_position.y += desired_velocity.y
 		unit_cell = battle_map.local_to_map(global_position)
 	
-	var new_vel = (desired_velocity.project(Vector3.BACK)+desired_velocity.project(Vector3.RIGHT)).normalized()
-	new_vel *= AUTO_SPEED
-	velocity.x = new_vel.x
-	velocity.z = new_vel.z
+	velocity.x = desired_velocity.x*AUTO_SPEED
+	velocity.z = desired_velocity.z*AUTO_SPEED
 	
 	if desired_velocity.y < 0 and not is_on_floor():
 		velocity.x = 0
@@ -130,12 +123,13 @@ func check_input():
 	
 
 func _physics_process(delta):
-	if !is_active: return
+	if not is_active: return
 	
-	if !path_stack.is_empty():
+	if not path_stack.is_empty():
 		path_movement(delta)
 	
-	if !is_moving:
+	if not is_moving:
+		unit_cell = battle_map.local_to_map(global_position)
 		check_input()
 	
 	if velocity.x == 0 and velocity.z == 0: 
@@ -149,8 +143,7 @@ func _physics_process(delta):
 	if not is_on_floor() and not is_moving: 
 		velocity.y += get_gravity()*delta
 	
-	if !is_moving:
-		unit_cell = battle_map.local_to_map(global_position)
+	if not is_moving:
 		tested = false
 	
 func translate_grid_center(cell : Vector3, grab_center : bool = true):

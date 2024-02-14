@@ -18,6 +18,5 @@ var clock_time_inc : float = 0
 var source : Object = null
 	
 func _tick_duration(d_type : Utils.DurationType):
-	var check_type = d_type == duration_type
-	if check_type: duration -= 1
-	return check_type
+	if d_type == duration_type: duration -= 1
+	return duration <= 0

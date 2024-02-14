@@ -1,4 +1,5 @@
 extends Node
+class_name CombatService
 
 @onready var nav_serve = $"../NavService"
 @onready var battle_map : BattleMap = $"../Environment/BattleMap"

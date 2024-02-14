@@ -25,6 +25,8 @@ var desired_fov : float
 # Used if player wants to move camera freely.
 var move_mode = false
 
+var has_moved = false
+
 # Snap screen to target unit.
 var target : Unit = null
 var target_position : Vector3
@@ -68,6 +70,7 @@ func camera_rot(event):
 		if y_rot < 0:
 			y_rot += 2*PI
 			pivot.rotation.y += 2*PI
+		has_moved = true
 		
 	elif event.is_action_pressed("rot_right"):
 		set_process_input(false)
@@ -75,14 +78,17 @@ func camera_rot(event):
 		if y_rot > 2*PI:
 			y_rot -= 2*PI
 			pivot.rotation.y -= 2*PI
+		has_moved = true
 	
 	elif event.is_action_pressed("rot_up"):
 		set_process_input(false)
 		x_rot -= rot_displacement
+		has_moved = true
 	
 	elif event.is_action_pressed("rot_down"):
 		set_process_input(false)
 		x_rot += rot_displacement
+		has_moved = true
 
 func move_camera(h, v, joystick):
 	if !joystick and h == 0 and v == 0 or target: return
@@ -119,6 +125,8 @@ func follow():
 	set_up_direction(Vector3.UP)
 	move_and_slide()
 	vel = velocity
+	
+	has_moved = true
 
 func get_mouse_position():
 	var space_state = get_world_3d().direct_space_state

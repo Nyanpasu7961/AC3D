@@ -1,14 +1,14 @@
 [gd_scene load_steps=5 format=3 uid="uid://dgpcw5200jy8q"]
 
-[ext_resource type="Script" path="res://Components/HealthComponent.gd" id="1_algkd"]
-[ext_resource type="Texture2D" uid="uid://mx2jidsrej4" path="res://SpriteAssets/underbar.png" id="2_axiai"]
-[ext_resource type="Texture2D" uid="uid://c33ynmsksfbq3" path="res://SpriteAssets/progressbar.png" id="3_di3qp"]
+[ext_resource type="Script" path="res://Components/Entity/HealthComponent.gd" id="1_wjaf1"]
+[ext_resource type="Texture2D" uid="uid://mx2jidsrej4" path="res://SpriteAssets/underbar.png" id="2_hc16s"]
+[ext_resource type="Texture2D" uid="uid://c33ynmsksfbq3" path="res://SpriteAssets/progressbar.png" id="3_vm8w4"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_tyjat"]
 viewport_path = NodePath("BarViewPort")
 
 [node name="HealthComponent" type="Node3D"]
-script = ExtResource("1_algkd")
+script = ExtResource("1_wjaf1")
 
 [node name="BarSprite" type="Sprite3D" parent="."]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
@@ -25,5 +25,5 @@ size_2d_override = Vector2i(72, 16)
 offset_right = 18.0
 offset_bottom = 4.0
 value = 50.0
-texture_under = ExtResource("2_axiai")
-texture_progress = ExtResource("3_di3qp")
+texture_under = ExtResource("2_hc16s")
+texture_progress = ExtResource("3_vm8w4")

@@ -17,8 +17,11 @@ func _ready():
 	hp_bar.max_value = MAX_HP
 	curr_hp = MAX_HP
 	hp_bar.value = curr_hp
+	
+	bar_sprite.position = Vector3.UP*0.5
 
 func _process(delta):
+	global_rotation = Vector3.ZERO
 	if hp_changed:
 		# TODO: Put decrease health animation here.
 		hp_bar.value = curr_hp

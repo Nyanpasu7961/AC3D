@@ -1,6 +1,6 @@
 [gd_scene load_steps=18 format=3 uid="uid://belm50so7ukls"]
 
-[ext_resource type="Script" path="res://Components/MoveEntityComp.gd" id="1_lken2"]
+[ext_resource type="Script" path="res://Components/Entity/MoveEntityComp.gd" id="1_l13sf"]
 
 [sub_resource type="Animation" id="Animation_5kvdb"]
 resource_name = "JUMP"
@@ -51,7 +51,7 @@ states/WALK/position = Vector2(655, 177)
 transitions = ["Start", "IDLE", SubResource("AnimationNodeStateMachineTransition_ya4hq"), "IDLE", "WALK", SubResource("AnimationNodeStateMachineTransition_apejv"), "WALK", "JUMP", SubResource("AnimationNodeStateMachineTransition_ea8q3"), "WALK", "IDLE", SubResource("AnimationNodeStateMachineTransition_ocrki"), "IDLE", "JUMP", SubResource("AnimationNodeStateMachineTransition_7o0xs"), "IDLE", "DAMAGE", SubResource("AnimationNodeStateMachineTransition_6rdqs"), "JUMP", "IDLE", SubResource("AnimationNodeStateMachineTransition_gm6v8"), "JUMP", "WALK", SubResource("AnimationNodeStateMachineTransition_1w8ep"), "DAMAGE", "IDLE", SubResource("AnimationNodeStateMachineTransition_ki1jd")]
 
 [node name="MEC" type="Node3D"]
-script = ExtResource("1_lken2")
+script = ExtResource("1_l13sf")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

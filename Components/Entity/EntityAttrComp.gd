@@ -18,6 +18,7 @@ func _ready():
 func initialise_attr():
 	for attributes in Utils.AttributeTypes:
 		entity_attr[attributes] = 0
+		_collated_mods[attributes] = {}
 		for value_types in Utils.ValueTypes:
 			_collated_mods[attributes][value_types] = 0
 
@@ -39,6 +40,14 @@ func rm_modifier(mod : AttrMod):
 		_collated_mods[mod.t_stat][mod.value_type] -= mod.value
 		
 	return index
+
+func tick_modifiers(d_type : Utils.DurationType):
+	var expired_mods = []
+	for mod in _stat_mods:
+		var expired = mod._tick_duration(d_type)
+		if expired: expired_mods.append(mod)
+		
+	return expired_mods
 
 func order_modifiers(a : AttrMod, b : AttrMod): 
 	return a.value_type < b.value_type

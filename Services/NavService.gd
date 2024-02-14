@@ -1,4 +1,4 @@
-class_name NavAvailable
+class_name NavService
 extends Node
 
 @onready var battle_map : GridMap = $"../Environment/BattleMap"
@@ -156,9 +156,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 func grab_skill_area(unit : Unit, skill : Skill):
 	return cell_flood_fill(unit.unit_cell, skill.range, skill.h_range)
 
-
 func initialise_astar():
-	
 	var tile_no = nav_cells.size()
 	_astar_map.reserve_space(tile_no)
 
