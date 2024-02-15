@@ -1,10 +1,19 @@
 extends Node
 class_name CombatService
 
-@onready var nav_serve = $"../NavService"
-@onready var battle_map : BattleMap = $"../Environment/BattleMap"
+# Handles all turns of battle including initialisation, checking hit probabilities, etc.
+# Deals with showing available tiles and setting borders.
+
+var nav_serve : NavService
+var battle_map : BattleMap
+var unit_holder : UnitHolder
 
 var obtained_move = false
+
+func initialise_combat_serve(ns : NavService, bm : BattleMap, uh : UnitHolder):
+	nav_serve = ns
+	battle_map = bm
+	unit_holder = uh
 
 func increment_clocktime():
 	#queue pop here
@@ -17,5 +26,11 @@ func turn_start(unit : Unit):
 		battle_map.set_border(nav_serve.get_border(reach_tiles, unit))
 		obtained_move = true
 		unit.is_active = true
-	
-	
+		unit_holder.active_unit = unit
+
+# Increase power based on hit probability.
+func check_hit_confirm(source_unit : Unit, target_unit : Unit):
+	pass
+
+func calculate_damage(source_unit : Unit, target_unit : Unit, skill : Skill):
+	pass

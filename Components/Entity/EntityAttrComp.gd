@@ -4,12 +4,17 @@ extends Node3D
 # Change to unit stats file to set attributes
 # var stats_file = preload("res://addons/godot-jolt/LICENSE.txt")
 
+var clock_time : int
+
 var entity_attr : Dictionary
 var _stat_mods : Array[AttrMod]
 var _collated_mods : Dictionary
 
 var _is_dirty : bool = true
 var final_stats
+
+var main_job : Job
+var sub_job : Job
 
 func _ready():
 	initialise_attr()
@@ -24,6 +29,9 @@ func initialise_attr():
 
 func load_unit_stats():
 	pass
+
+func tick_clock_time() -> void:
+	clock_time += entity_attr[Utils.AttributeTypes.AGI]*0.1
 
 func add_modifier(mod : AttrMod) -> void:
 	_is_dirty = true

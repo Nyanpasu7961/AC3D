@@ -9,9 +9,8 @@ const SPEED = 5.0
 const AUTO_SPEED = 10.0
 const JUMP_VELOCITY = 2.0
 
-@onready var battle_map : GridMap = $"../../Environment/BattleMap"
-@onready var nav_serve = $"../../NavService"
-@onready var camera_comp = $"../../CameraMove"
+var battle_map : GridMap
+var camera_comp : CameraBody
 
 # Check if the currently controlled unit is this one.
 var is_active = false
@@ -38,7 +37,10 @@ const ARRIVE_DISTANCE = 0.25
 
 var height_scale : float = 1
 
-func _ready():
+func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody):
+	battle_map = bm
+	camera_comp = cam
+	
 	cell_size = battle_map.cell_size
 	ts_cell = battle_map.local_to_map(global_position)
 	map_id = battle_map.get_instance_id()
@@ -155,7 +157,7 @@ func force_snap_to_grid():
 	var to = cell+Vector3(cell_size.x/2, 0, cell_size.z/2)
 	global_position = to
 
-# Readjusts unit to grid position.
+# Readjusts unit to nearest grid position.
 func snap_to_grid():
 	var cell = battle_map.local_to_map(global_position) as Vector3
 	var from = Vector3(global_position.x, cell.y, global_position.z)

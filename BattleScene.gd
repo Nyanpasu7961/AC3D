@@ -1,24 +1,30 @@
 extends Node3D
 
 @onready var battle_map : GridMap = $Environment/BattleMap
-@onready var camerabody : CameraBody = $CameraMove
+@onready var camera_body : CameraBody = $CameraMove
 @onready var combat_serve : CombatService = $CombatService
 @onready var nav_serve : NavService = $NavService
 @onready var ui_control : UIComponent = $UICanvas/UIComponent
+@onready var unit_holder : UnitHolder = $UnitHolder
 
 var test_skill : Skill
 var tested = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	camerabody.target = $UnitHolder/Unit
+	camera_body.target = $UnitHolder/Unit
 	test_skill = Skill.new()
 	test_skill.range = 3
 	test_skill.h_range = 1
 	
+	nav_serve._init_nav_serve(battle_map)
+	unit_holder.initialise_units(ui_control, battle_map, camera_body)
+	combat_serve.initialise_combat_serve(nav_serve, battle_map, unit_holder)
+	
 func _input(event):
+	if ui_control.is_hovered(): return
 	if event.is_action_pressed("select_tile"):
-		var mouse_tile = camerabody.get_mouse_position()
+		var mouse_tile = camera_body.get_mouse_position()
 		if !mouse_tile: return
 		nav_serve.astar_unit_path($UnitHolder/Unit, battle_map.l_transform_m(mouse_tile))
 
@@ -26,10 +32,9 @@ func _input(event):
 func _process(delta):
 	combat_serve.turn_start($UnitHolder/Unit)
 	
-	if ui_control.is_hovered(): return
-	var mouse_tile = camerabody.get_mouse_position()
-	if mouse_tile: battle_map.set_hover(mouse_tile)
-	
+	if not ui_control.is_hovered():
+		var mouse_tile = camera_body.get_mouse_position()
+		if mouse_tile: battle_map.set_hover(mouse_tile)
 	
 	# Testing for skill area.
 	if !$UnitHolder/Unit.tested:

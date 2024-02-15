@@ -1,7 +1,7 @@
 class_name NavService
 extends Node
 
-@onready var battle_map : GridMap = $"../Environment/BattleMap"
+var battle_map : BattleMap
 
 var _astar_map = AStarCustom.new()
 var _path : PackedVector3Array
@@ -14,7 +14,8 @@ var current_unit : Unit
 
 var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 
-func _ready():
+func _init_nav_serve(bm : BattleMap):
+	battle_map = bm
 	nav_cells = get_viewable_tiles()
 	initialise_astar()
 

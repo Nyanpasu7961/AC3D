@@ -1,4 +1,9 @@
+extends Resource
 class_name Skill
+
+var name : String = "None"
+var description : String = "No description."
+
 
 var skill_type : Utils.SkillType
 var weapon_type : Utils.WeaponType
