@@ -13,9 +13,10 @@ var tested = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	camera_body.target = $UnitHolder/Unit
+	
 	test_skill = Skill.new()
 	test_skill.range = 3
-	test_skill.h_range = 1
+	test_skill.height_range = 1
 	
 	nav_serve._init_nav_serve(battle_map)
 	unit_holder.initialise_units(ui_control, battle_map, camera_body)

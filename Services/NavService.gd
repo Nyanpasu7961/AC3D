@@ -155,7 +155,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 	return unique_borders
 
 func grab_skill_area(unit : Unit, skill : Skill):
-	return cell_flood_fill(unit.unit_cell, skill.range, skill.h_range)
+	return cell_flood_fill(unit.unit_cell, skill.range, skill.height_range)
 
 func initialise_astar():
 	var tile_no = nav_cells.size()

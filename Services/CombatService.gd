@@ -28,8 +28,11 @@ func turn_start(unit : Unit):
 		unit.is_active = true
 		unit_holder.active_unit = unit
 
+func apply_skill(source_unit : Unit, target_unit : Unit, skill : Skill):
+	pass
+
 # Increase power based on hit probability.
-func check_hit_confirm(source_unit : Unit, target_unit : Unit):
+func check_hit_confirm(source_unit : Unit, target_unit : Unit, skill : Skill):
 	pass
 
 func calculate_damage(source_unit : Unit, target_unit : Unit, skill : Skill):

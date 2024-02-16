@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Job" load_steps=3 format=3 uid="uid://5kwnuj4e2rb"]
+
+[ext_resource type="Resource" uid="uid://y6xn2ywkyg8" path="res://Entities/Skills/Slash.tres" id="1_tub6t"]
+[ext_resource type="Script" path="res://Entities/Jobs/Job.gd" id="2_lr8d7"]
+
+[resource]
+script = ExtResource("2_lr8d7")
+main_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([ExtResource("1_tub6t")])
+sub_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([ExtResource("1_tub6t")])

@@ -19,7 +19,6 @@ func is_hovered():
 
 func set_skill_list(skills : Array):
 	skill_scroll.visible = true
-	
 	for s in skills:
 		var button = Utils.create_skill_button(s)
 		skill_list.add_child(button)

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Attributes" load_steps=2 format=3 uid="uid://bveteu4sq7ink"]
+
+[ext_resource type="Script" path="res://Entities/Attributes/Attributes.gd" id="1_lg5kl"]
+
+[resource]
+script = ExtResource("1_lg5kl")
+hp = 100.0
+patk = 4.0
+pdef = 3.0
+agi = 10.0

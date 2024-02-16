@@ -70,6 +70,7 @@ layout_mode = 2
 text = "End Turn"
 
 [node name="SkillScroll" type="ScrollContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0

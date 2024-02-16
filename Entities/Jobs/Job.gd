@@ -1,7 +1,5 @@
-extends Resource
 class_name Job
+extends Resource
 
-var main_skills : Array[Skill]
-var sub_skills : Array[Skill]
-var is_unlocked : bool = false
-
+@export var main_skills : Array[Skill]
+@export var sub_skills : Array[Skill]

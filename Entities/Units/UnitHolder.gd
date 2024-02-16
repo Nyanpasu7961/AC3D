@@ -32,13 +32,17 @@ func initialise_units(control : UIComponent, bm : BattleMap, cam : CameraBody):
 			child._initialise_unit_mvmt(bm, cam)
 
 func unit_main_skills():
+	ui_control.set_skill_list(active_unit.attr_comp._main_job.main_skills)
 	return
 	
 func unit_sub_skills():
+	print(2)
 	return
 	
 func unit_end_turn():
+	print(3)
 	return
 	
 func unit_basic_attack():
+	print(4)
 	return
