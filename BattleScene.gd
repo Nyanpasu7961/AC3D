@@ -8,7 +8,6 @@ extends Node3D
 @onready var unit_holder : UnitHolder = $UnitHolder
 
 var test_skill : Skill
-var tested = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -19,11 +18,12 @@ func _ready():
 	test_skill.height_range = 1
 	
 	nav_serve._init_nav_serve(battle_map)
-	unit_holder.initialise_units(ui_control, battle_map, camera_body)
+	unit_holder.initialise_units(ui_control, battle_map, camera_body, nav_serve)
 	combat_serve.initialise_combat_serve(nav_serve, battle_map, unit_holder)
 	
 func _input(event):
 	if ui_control.is_hovered(): return
+	
 	if event.is_action_pressed("select_tile"):
 		var mouse_tile = camera_body.get_mouse_position()
 		if !mouse_tile: return
@@ -38,7 +38,7 @@ func _process(delta):
 		if mouse_tile: battle_map.set_hover(mouse_tile)
 	
 	# Testing for skill area.
-	if !$UnitHolder/Unit.tested:
-		var test_cells = nav_serve.grab_skill_area($UnitHolder/Unit, test_skill)
-		battle_map.map_set_skill(test_cells)
-		$UnitHolder/Unit.tested = true
+	#if !$UnitHolder/Unit.tested:
+	#	var test_cells = nav_serve.grab_skill_area($UnitHolder/Unit, test_skill)
+	#	battle_map.map_set_skill(test_cells)
+	#	$UnitHolder/Unit.tested = true

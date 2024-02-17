@@ -93,8 +93,8 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int):
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
 func get_reachable_tiles(unit : Unit, inverted : bool = false):
 	var tsc = battle_map.local_to_map(unit.ts_cell)
-	var mr = unit.move_comp.move_range
-	var jr = unit.move_comp.jump_range
+	var mr = unit.attr_comp._base_attributes.MOVE
+	var jr = unit.attr_comp._base_attributes.JUMP
 	
 	# Flood fill algorithm
 	var avail_tiles = cell_flood_fill(tsc, mr, jr)
@@ -110,8 +110,8 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 
 
 func get_border(avail_tiles : Array, unit : Unit):
-	var move_range = unit.move_comp.move_range
-	var jump_range = unit.move_comp.jump_range
+	var move_range = unit.attr_comp._base_attributes.MOVE
+	var jump_range = unit.attr_comp._base_attributes.JUMP
 	
 	#TODO: Fix so that it uses the avail tiles instead of unit pos for border.
 	var max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b)

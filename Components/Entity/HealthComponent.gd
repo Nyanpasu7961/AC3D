@@ -6,7 +6,7 @@ extends Node3D
 
 const BAR_DISTANCE = 0.5
 
-@export var attr_comp : EntityAttrComp
+var attr_comp : EntityParameters
 
 @export var MAX_HP : float
 var curr_hp : float

@@ -1,7 +1,13 @@
 class_name Attributes
 extends Resource
 
-@export var hp : float
-@export var patk : float
-@export var pdef : float
-@export var agi : float = 10.0
+@export var MAXHP : float
+@export var HP : float
+@export var MAXJ : float
+@export var JEWELS : float
+@export var PATK : float
+@export var PDEF : float
+@export var AGI : float = 10.0
+@export var DEX : float
+@export var MOVE : int
+@export var JUMP : int

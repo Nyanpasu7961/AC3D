@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://y6xn2ywkyg8"]
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://pssknbvqly47"]
 
-[ext_resource type="Script" path="res://Entities/Skills/Skill.gd" id="2_ntwab"]
+[ext_resource type="Script" path="res://Entities/Skills/Skill.gd" id="1_bvjjc"]
 
 [resource]
-script = ExtResource("2_ntwab")
-name = "Slash"
+script = ExtResource("1_bvjjc")
+name = "None"
 description = "No description."
 skill_type = 0
 weapon_type = 0
-modifiers = Array[Resource("res://Entities/Units/AttrModifier.gd")]([])
+modifiers = Array[Resource("res://Entities/Attributes/AttrModifier.gd")]([])
 statuses = Array[Resource("res://Entities/Statuses/StatusAilment.gd")]([])
 jewel_cost = 0
 cast_time = 0

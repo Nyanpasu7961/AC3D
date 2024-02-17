@@ -51,7 +51,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.48231, 1.34852, -0.163158)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, 2.51217)
 
 [editable path="Environment/BattleMap"]
-[editable path="UnitHolder/Unit2"]
-[editable path="UnitHolder/Unit2/MEC"]
-[editable path="UnitHolder/Unit"]
-[editable path="UnitHolder/Unit/MEC"]

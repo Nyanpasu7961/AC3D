@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EntityParameters" load_steps=4 format=3 uid="uid://bq5fsw2c26656"]
+
+[ext_resource type="Resource" uid="uid://bveteu4sq7ink" path="res://Entities/Attributes/knight_attr.tres" id="1_snoyb"]
+[ext_resource type="Script" path="res://Entities/EntityResource.gd" id="1_vqt35"]
+[ext_resource type="Resource" uid="uid://dassa0c0dohtb" path="res://Entities/Jobs/knight_job.tres" id="2_mkbws"]
+
+[resource]
+script = ExtResource("1_vqt35")
+_main_job = ExtResource("2_mkbws")
+_sub_job = ExtResource("2_mkbws")
+_base_attributes = ExtResource("1_snoyb")

@@ -1,8 +1,5 @@
-class_name EntityAttrComp
-extends Node3D
-
-# Change to unit stats file to set attributes
-# var stats_file = preload("res://addons/godot-jolt/LICENSE.txt")
+class_name EntityParameters
+extends Resource
 
 @export var _main_job : Job
 @export var _sub_job : Job
@@ -48,4 +45,3 @@ func order_modifiers(a : AttrMod, b : AttrMod):
 
 func sort_modifiers():
 	_stat_mods.sort_custom(order_modifiers)
-

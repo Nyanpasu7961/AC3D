@@ -3,7 +3,7 @@ extends CharacterBody3D
 
 @export var health_comp : HealthComponent
 @export var move_comp : MoveComponent
-@export var attr_comp : EntityAttrComp
+@export var attr_comp : EntityParameters
 
 const SPEED = 5.0
 const AUTO_SPEED = 10.0
@@ -14,6 +14,8 @@ var camera_comp : CameraBody
 
 # Check if the currently controlled unit is this one.
 var is_active = false
+# Check if skill area is currently being selected
+var skill_select = false
 
 var map_id
 
@@ -40,6 +42,9 @@ var height_scale : float = 1
 func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody):
 	battle_map = bm
 	camera_comp = cam
+	
+	health_comp.attr_comp = attr_comp
+	move_comp.initialise_move_comp(attr_comp)
 	
 	cell_size = battle_map.cell_size
 	ts_cell = battle_map.local_to_map(global_position)
@@ -170,4 +175,9 @@ func snap_to_grid():
 	velocity.x += vel.x
 	velocity.z += vel.z
 
+func skill_damage(skill : Skill):
+	# Show AOE
+	#print(skill.name)
+	#attr_comp.skill_damage(skill)
+	return
 
