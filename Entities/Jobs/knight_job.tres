@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="Job" load_steps=3 format=3 uid="uid://dassa0c0dohtb"]
+[gd_resource type="Resource" script_class="Job" load_steps=4 format=3 uid="uid://dassa0c0dohtb"]
 
 [ext_resource type="Resource" uid="uid://bir7frm8t2gij" path="res://Entities/Skills/Slash_skill.tres" id="1_tf32i"]
 [ext_resource type="Script" path="res://Entities/Jobs/Job.gd" id="2_lr8d7"]
+[ext_resource type="Resource" uid="uid://pssknbvqly47" path="res://Entities/Skills/SubMagic.tres" id="3_awes3"]
 
 [resource]
 script = ExtResource("2_lr8d7")
 main_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([ExtResource("1_tf32i")])
-sub_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([])
+sub_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([ExtResource("3_awes3")])

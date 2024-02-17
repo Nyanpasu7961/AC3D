@@ -6,7 +6,7 @@ extends CharacterBody3D
 @export var attr_comp : EntityParameters
 
 const SPEED = 5.0
-const AUTO_SPEED = 10.0
+const AUTO_SPEED = 5.0
 const JUMP_VELOCITY = 2.0
 
 var battle_map : GridMap
@@ -43,7 +43,7 @@ func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody):
 	battle_map = bm
 	camera_comp = cam
 	
-	health_comp.attr_comp = attr_comp
+	health_comp.initialise_health_comp(attr_comp)
 	move_comp.initialise_move_comp(attr_comp)
 	
 	cell_size = battle_map.cell_size

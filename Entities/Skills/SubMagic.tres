@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://pssknbvqly47"]
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://pssknbvqly47"]
 
 [ext_resource type="Script" path="res://Entities/Skills/Skill.gd" id="1_bvjjc"]
+[ext_resource type="Resource" uid="uid://p3663xgoy3lv" path="res://Entities/Skills/SubMagicScaling.tres" id="1_c2va1"]
 
 [resource]
 script = ExtResource("1_bvjjc")
-name = "None"
+name = "Submagic"
 description = "No description."
 skill_type = 0
 weapon_type = 0
@@ -13,9 +14,9 @@ statuses = Array[Resource("res://Entities/Statuses/StatusAilment.gd")]([])
 jewel_cost = 0
 cast_time = 0
 power_scaling = 1.0
-range = 1
-height_range = 1
-area_length = 1
+range = 6
+height_range = 3
+area_length = 3
 area_type = 0
 piercing = false
-attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([])
+attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([ExtResource("1_c2va1")])

@@ -43,7 +43,14 @@ func unit_main_skills():
 	var buttons = ui_control.set_skill_list(skills)
 	for h in buttons:
 		h.button.connect("pressed", func(): skill_select_area(h.skill))
-		
+
+func unit_sub_skills():
+	ui_control.clear_skill_list()
+	var skills = active_unit.attr_comp._sub_job.sub_skills
+	var buttons = ui_control.set_skill_list(skills)
+	for h in buttons:
+		h.button.connect("pressed", func(): skill_select_area(h.skill))
+
 func back_to_skill_select():
 	# Enable unit movement.
 	active_unit.skill_select = false
@@ -72,14 +79,7 @@ func select_area_check(skill : Skill):
 	return
 
 
-func unit_sub_skills():
-	ui_control.clear_skill_list()
-	var skills = active_unit.attr_comp._sub_job.sub_skills
-	var buttons = ui_control.set_skill_list(skills)
-	for h in buttons:
-		h.button.connect("pressed", func(): skill_select_area(h.skill))
-		
-	return
+
 	
 func unit_end_turn():
 	print(3)

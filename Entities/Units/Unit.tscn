@@ -17,7 +17,6 @@ move_comp = NodePath("MEC")
 attr_comp = ExtResource("2_s8qu8")
 
 [node name="HealthComponent" parent="." instance=ExtResource("2_m1dph")]
-MAX_HP = 500.0
 
 [node name="MEC" parent="." instance=ExtResource("4_nc1tp")]
 

@@ -4,10 +4,8 @@
 
 [resource]
 script = ExtResource("1_lg5kl")
-MAXHP = 0.0
-HP = 0.0
+MAXHP = 1000.0
 MAXJ = 0.0
-JEWELS = 0.0
 PATK = 0.0
 PDEF = 0.0
 AGI = 10.0
