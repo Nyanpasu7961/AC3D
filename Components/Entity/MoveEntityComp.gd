@@ -6,10 +6,10 @@ var attr_comp : EntityParameters
 @export var TIME_TO_PEAK : float = 0.5
 @export var TIME_TO_FALL : float = 0.4
 
-var jump_height
-var jump_vel
-var jump_gravity
-var fall_gravity
+var jump_height : float
+var jump_vel : float
+var jump_gravity : float
+var fall_gravity : float
 
 const SPEED = 7
 const ANIMATION_FRAMES = 1

@@ -69,7 +69,6 @@ func get_gravity() -> float:
 func path_movement(delta):
 	var arrived_to_next_point = _move_to(_next_point, delta)
 	if arrived_to_next_point:
-		force_snap_to_grid()
 		path_stack.remove_at(0)
 		unit_cell = battle_map.local_to_map(global_position)
 		if path_stack.is_empty():
@@ -130,7 +129,7 @@ func check_input():
 	
 
 func _physics_process(delta):
-	if not is_active: return
+	if not is_active or skill_select: return
 	
 	if not path_stack.is_empty():
 		path_movement(delta)

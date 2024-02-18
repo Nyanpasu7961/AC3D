@@ -38,6 +38,10 @@ data = {
 }
 metadata/_editor_floor_ = Vector3(0, 1, 0)
 
+[node name="Obstructors" type="Node3D" parent="Environment"]
+
+[node name="CastTimeHighlight" type="Node3D" parent="Environment"]
+
 [node name="CameraMove" parent="." instance=ExtResource("6_w0s2y")]
 
 [node name="UnitHolder" type="Node3D" parent="."]

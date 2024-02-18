@@ -4,6 +4,8 @@ class_name UIComponent
 @onready var control_containers = $TurnUIControl
 @onready var skill_scroll = $SkillSelection/SkillScroll
 @onready var skill_list : VBoxContainer = $SkillSelection/SkillScroll/SkillList
+
+@onready var skill_selection_cont = $SkillSelection
 @onready var confirm_container = $SkillSelection/ConfirmHBox
 @onready var confirm_button : Button = $SkillSelection/ConfirmHBox/ConfirmButton
 @onready var back_button : Button = $SkillSelection/ConfirmHBox/BackButton
@@ -39,8 +41,6 @@ func clear_skill_list():
 		disconnect_all_signals_name(button, "pressed")
 
 func set_skill_list(skills : Array):
-	skill_scroll.visible = true
-	
 	var button_pointers = []
 	
 	var button_nodes = skill_list.get_children()
@@ -54,7 +54,3 @@ func set_skill_list(skills : Array):
 		button_pointers.append(ButtonHandler.new(button_nodes[i], skills[i]))
 
 	return button_pointers
-
-func set_confirm():
-	confirm_button.visible = true
-	return confirm_button

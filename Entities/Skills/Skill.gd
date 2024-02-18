@@ -33,6 +33,9 @@ extends Resource
 # x_component = attribute type, y_component = scale factor
 @export var attribute_use : Array[Scaling]
 
+func has_cast():
+	return cast_time != 0
+
 # TODO: Still need to finish for damaging skill types
 #func apply_skill(target : Unit):
 #	target.apply_modifiers(modifiers)

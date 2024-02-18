@@ -22,7 +22,6 @@ func initialise_health_comp(ac : EntityParameters):
 	
 	curr_hp = max_hp
 	
-
 func _process(delta):
 	global_rotation = Vector3.ZERO
 	if hp_changed:
