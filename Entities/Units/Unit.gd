@@ -11,6 +11,8 @@ const JUMP_VELOCITY = 2.0
 
 var battle_map : GridMap
 var camera_comp : CameraBody
+var nav_serve : NavService
+var ui_control : UIComponent
 
 # Check if the currently controlled unit is this one.
 var is_active = false
@@ -39,9 +41,11 @@ const ARRIVE_DISTANCE = 0.25
 
 var height_scale : float = 1
 
-func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody):
+func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody, uc : UIComponent, ns : NavService):
 	battle_map = bm
 	camera_comp = cam
+	ui_control = uc
+	nav_serve = ns
 	
 	health_comp.initialise_health_comp(attr_comp)
 	move_comp.initialise_move_comp(attr_comp)
@@ -54,6 +58,15 @@ func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody):
 func _process(delta):
 	adjust_healthbar()
 	pass
+
+func _input(event):
+	if !is_active or skill_select: return
+	if ui_control.is_hovered(): return
+	
+	if event.is_action_pressed("select_tile"):
+		var mouse_tile = camera_comp.get_mouse_position()
+		if mouse_tile:
+			nav_serve.astar_unit_path(self, battle_map.l_transform_m(mouse_tile))
 
 func adjust_healthbar():
 	var cam_rot = camera_comp.pivot.rotation
@@ -173,6 +186,10 @@ func snap_to_grid():
 	var vel = (to-from)*SPEED
 	velocity.x += vel.x
 	velocity.z += vel.z
+
+func deal_damage(dmg : float):
+	print("ouch")
+	health_comp.take_dmg(dmg)
 
 func skill_damage(skill : Skill):
 	# Show AOE

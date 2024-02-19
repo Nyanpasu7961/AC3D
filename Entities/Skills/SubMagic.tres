@@ -6,17 +6,17 @@
 [resource]
 script = ExtResource("1_bvjjc")
 name = "Submagic"
-description = "No description."
-skill_type = 0
-weapon_type = 0
-modifiers = Array[Resource("res://Entities/Attributes/AttrModifier.gd")]([])
-statuses = Array[Resource("res://Entities/Statuses/StatusAilment.gd")]([])
-jewel_cost = 0
-cast_time = 0
-power_scaling = 1.0
+description = null
+skill_type = null
+weapon_type = null
+modifiers = null
+statuses = null
+jewel_cost = null
+cast_time = null
+power_scaling = null
 range = 6
 height_range = 3
 area_length = 3
-area_type = 0
-piercing = false
+area_type = null
+piercing = null
 attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([ExtResource("1_c2va1")])

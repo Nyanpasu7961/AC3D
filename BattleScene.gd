@@ -21,13 +21,7 @@ func _ready():
 	unit_holder.initialise_units(ui_control, battle_map, camera_body, nav_serve)
 	combat_serve.initialise_combat_serve(nav_serve, battle_map, unit_holder)
 	
-func _input(event):
-	if ui_control.is_hovered(): return
-	
-	if event.is_action_pressed("select_tile"):
-		var mouse_tile = camera_body.get_mouse_position()
-		if !mouse_tile: return
-		nav_serve.astar_unit_path($UnitHolder/Unit, battle_map.l_transform_m(mouse_tile))
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

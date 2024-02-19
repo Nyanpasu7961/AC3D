@@ -14,7 +14,7 @@ var battle_map : BattleMap
 var units = []
 var active_unit : Unit
 
-var selected_area : Vector3i
+var selected_area : Vector3
 
 func initialise_units(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : NavService):
 	ui_control = control
@@ -35,7 +35,8 @@ func initialise_units(control : UIComponent, bm : BattleMap, cam : CameraBody, n
 	# Change when loading units from file
 	for child in get_children():
 		if child is Unit:
-			child._initialise_unit_mvmt(bm, cam)
+			child._initialise_unit_mvmt(bm, cam, control, ns)
+			units.append(child)
 
 func unit_skills(is_main_skills : bool = true):
 	ui_control.clear_skill_list()
@@ -53,8 +54,12 @@ func toggle_visibility(ss : bool, ssc : bool, cc : bool):
 	ui_control.skill_selection_cont.visible = ssc
 	ui_control.confirm_container.visible = cc
 
+func unhighlight_skill():
+	battle_map.map_set_skill([])
+
 func back_to_skill_select():
 	# Enable unit movement.
+	unhighlight_skill()
 	toggle_visibility(false, true, false)
 	ui_control.disconnect_all_signals_name(ui_control.confirm_button, "pressed")
 
@@ -78,13 +83,26 @@ func _input(event : InputEvent):
 	if active_unit.skill_select and event.is_action_pressed("select_tile"):
 		if ui_control.is_hovered(): return
 		selected_area = camera_body.get_mouse_position()
+		selected_area = battle_map.local_to_map(selected_area)
 		print(selected_area)
 
+func select_is_unit() -> Unit:
+	for unit : Unit in units:
+		if selected_area == unit.unit_cell:
+			return unit
+	return null
+
 func select_area_check(skill : Skill):
+	var selected_square = select_is_unit()
+	if not selected_square is Unit: print("Invalid skill select position."); return
+	
+	selected_square.deal_damage(200)
+	
 	# Check if area selected is overlapped by an obstruction
 	# if nav_cells.obstructed(selected_area): skill_select_area(skill)
 	# If not, create a cast time window or deal damage to unit or blank.
 	toggle_visibility(false, false, false)
+	unhighlight_skill()
 	print(active_unit.skill_select, selected_area)
 	return
 	

@@ -32,7 +32,8 @@ func _process(delta):
 func take_dmg(dmg : float):
 	hp_changed = true
 	curr_hp -= dmg
-	if curr_hp < 0:
+	print(curr_hp)
+	if curr_hp <= 0:
 		print("death")
 
 func heal(health : float):
