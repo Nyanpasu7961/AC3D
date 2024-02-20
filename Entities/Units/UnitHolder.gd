@@ -66,6 +66,8 @@ func back_to_skill_select():
 func skill_select_area(skill : Skill):
 	# Set select default to unit position.
 	selected_area = active_unit.unit_cell
+	$"../Environment/CastTimeHighlight".set_to_cell(selected_area)
+	#var highlighted_area = nav_serve.grab_skill_aoe(selected_area, skill)
 	
 	toggle_visibility(true, true, true)
 	
@@ -84,6 +86,7 @@ func _input(event : InputEvent):
 		if ui_control.is_hovered(): return
 		selected_area = camera_body.get_mouse_position()
 		selected_area = battle_map.local_to_map(selected_area)
+		$"../Environment/CastTimeHighlight".set_to_cell(selected_area)
 		print(selected_area)
 
 func select_is_unit() -> Unit:

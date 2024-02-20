@@ -1,44 +1,44 @@
 class_name Skill
 extends Resource
 
-@export var name : String = "None"
-@export var description : String = "No description."
+@export var _name : String = "None"
+@export var _description : String = "No description."
 
 
-@export var skill_type : Utils.SkillType
-@export var weapon_type : Utils.WeaponType
-@export var modifiers : Array[AttrMod]
-@export var statuses : Array[StatusAilment]
+@export var _skill_type : Utils.SkillType
+@export var _weapon_type : Utils.WeaponType
+@export var _modifiers : Array[AttrMod]
+@export var _statuses : Array[StatusAilment]
 
 # MP cost of the skill.
-@export var jewel_cost : int = 0
+@export var _jewel_cost : int = 0
 
 # AC Cast Time
-@export var cast_time : int = 0
+@export var _cast_time : int = 0
 
 # Power scaling in terms of percentage.
-@export var power_scaling : float = 1.0
+@export var _power_scaling : float = 1.0
 # Range for the xz-axis
-@export var range : int = 1
+@export var _range : int = 1
 # Range for the y-axis
-@export var height_range : int = 1
+@export var _height_range : int = 1
 
 # Area
-@export var area_length : int = 1
-@export var area_type : Utils.AreaType = Utils.AreaType.SQUARE
+@export var _area_length : int = 1
+@export var _area_type : Utils.AreaType = Utils.AreaType.SQUARE
 
 # Ignore defense
-@export var piercing : bool = false
+@export var _piercing : bool = false
 
 # Overall skill damage multiplier
-@export var skill_effect : float = 0
+@export var _skill_effect : float = 0
 
 # x_component = attribute type, y_component = scale factor
-@export var attribute_use : Array[Scaling]
+@export var _attribute_use : Array[Scaling]
 
 
 func has_cast():
-	return cast_time != 0
+	return _cast_time != 0
 
 # TODO: Still need to finish for damaging skill types
 #func apply_skill(target : Unit):

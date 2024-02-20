@@ -50,7 +50,7 @@ func set_skill_list(skills : Array):
 	for i in range(skills.size()):
 		button_nodes[i].visible = true
 
-		button_nodes[i].text = skills[i].name
+		button_nodes[i].text = skills[i]._name
 		button_pointers.append(ButtonHandler.new(button_nodes[i], skills[i]))
 
 	return button_pointers

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://rysgdcqdsxkf"]
+[gd_scene load_steps=12 format=3 uid="uid://rysgdcqdsxkf"]
 
 [ext_resource type="Script" path="res://BattleScene.gd" id="1_0vlf7"]
 [ext_resource type="PackedScene" uid="uid://c3i8jspdnq5el" path="res://Components/UI/ui_component.tscn" id="2_5osb8"]
@@ -6,8 +6,17 @@
 [ext_resource type="PackedScene" uid="uid://b2d6v2gar3raa" path="res://Map/grid_map.tscn" id="2_utyr3"]
 [ext_resource type="Script" path="res://Services/CombatService.gd" id="3_6djkd"]
 [ext_resource type="PackedScene" uid="uid://bkmpi4m63h40d" path="res://Entities/Units/Unit.tscn" id="3_nq6xp"]
+[ext_resource type="Script" path="res://CastTimeHighlight.gd" id="6_av8ff"]
 [ext_resource type="PackedScene" uid="uid://bw27smvokg0rp" path="res://Camera/camera_move.tscn" id="6_w0s2y"]
 [ext_resource type="Script" path="res://Entities/Units/UnitHolder.gd" id="7_3qxjp"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2wgpg"]
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gx62o"]
+render_priority = 100
+transparency = 1
+albedo_color = Color(0.65098, 0.380392, 1, 0.686275)
 
 [node name="BattleScene3D" type="Node3D"]
 script = ExtResource("1_0vlf7")
@@ -40,7 +49,14 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 
 [node name="Obstructors" type="Node3D" parent="Environment"]
 
-[node name="CastTimeHighlight" type="Node3D" parent="Environment"]
+[node name="CastTimeHighlight" type="Node3D" parent="Environment" node_paths=PackedStringArray("highlight_mesh")]
+script = ExtResource("6_av8ff")
+highlight_mesh = NodePath("PurpleHighlight")
+
+[node name="PurpleHighlight" type="MeshInstance3D" parent="Environment/CastTimeHighlight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.58955, 2.4559, 2.99629)
+mesh = SubResource("PlaneMesh_2wgpg")
+surface_material_override/0 = SubResource("StandardMaterial3D_gx62o")
 
 [node name="CameraMove" parent="." instance=ExtResource("6_w0s2y")]
 
