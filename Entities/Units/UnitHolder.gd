@@ -7,6 +7,7 @@ extends Node3D
 var ui_control : UIComponent = null
 var combat_serve : CombatService = null
 var nav_serve : NavService
+var casth : CastHighlight
 
 var camera_body : CameraBody
 var battle_map : BattleMap
@@ -14,13 +15,19 @@ var battle_map : BattleMap
 var units = []
 var active_unit : Unit
 
-var selected_area : Vector3
+var current_selected_skill : Skill
+var selected_area : Vector3i
 
-func initialise_units(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : NavService):
+var cell_size
+
+func initialise_units(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : NavService, cth : CastHighlight):
 	ui_control = control
 	battle_map = bm
 	camera_body = cam
 	nav_serve = ns
+	casth = cth
+	
+	cell_size = bm.cell_size
 	
 	# load unit information here
 	# load_units(path)
@@ -64,10 +71,11 @@ func back_to_skill_select():
 	ui_control.disconnect_all_signals_name(ui_control.confirm_button, "pressed")
 
 func skill_select_area(skill : Skill):
+	current_selected_skill = skill
 	# Set select default to unit position.
 	selected_area = active_unit.unit_cell
-	$"../Environment/CastTimeHighlight".set_to_cell(selected_area)
-	#var highlighted_area = nav_serve.grab_skill_aoe(selected_area, skill)
+	#$"../Environment/CastTimeHighlight".set_to_cell(selected_area)
+	highlight_the_area()
 	
 	toggle_visibility(true, true, true)
 	
@@ -84,14 +92,24 @@ func _input(event : InputEvent):
 	# Only used when selecting tiles for a skill.
 	if active_unit.skill_select and event.is_action_pressed("select_tile"):
 		if ui_control.is_hovered(): return
-		selected_area = camera_body.get_mouse_position()
-		selected_area = battle_map.local_to_map(selected_area)
-		$"../Environment/CastTimeHighlight".set_to_cell(selected_area)
-		print(selected_area)
+		
+		selected_area = battle_map.l_transform_m(camera_body.get_mouse_position())
+		
+		highlight_the_area()
+
+func highlight_the_area():
+	# Need to change from flood fill to something simpler.
+	var highlighted_area = nav_serve.grab_skill_aoe(selected_area, current_selected_skill)
+	# Translate relative to highlight position
+	highlighted_area = highlighted_area.map(func(x): return x - selected_area)
+	
+	casth.global_position = selected_area
+	casth.set_cell_highlighters(highlighted_area)
+	
 
 func select_is_unit() -> Unit:
 	for unit : Unit in units:
-		if selected_area == unit.unit_cell:
+		if selected_area == (unit.unit_cell as Vector3i):
 			return unit
 	return null
 

@@ -65,7 +65,6 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int):
 		result[curr_cell] = steps
 		
 		var blocked_jump = min(max_height-curr_cell.y, jump_range)
-		
 		for h in range(2, blocked_jump):
 			if curr_cell + h*Vector3i.UP in nav_cells:
 				blocked_jump = h-1
@@ -156,8 +155,12 @@ func get_border(avail_tiles : Array, unit : Unit):
 
 func grab_skill_area(unit : Unit, skill : Skill):
 	return cell_flood_fill(unit.unit_cell, skill._range, skill._height_range)
-	
+
+# TODO: Change to obtain highlights for different area types.
 func grab_skill_aoe(tile : Vector3i, skill : Skill):
+	#match skill._area_type:
+	#	Utils.AreaType.SQUARE:
+	#	Utils.AreaType.DIAMOND:
 	return cell_flood_fill(tile, max(0, skill._area_length-1), skill._height_range)
 
 func initialise_astar():

@@ -26,11 +26,11 @@ transparency = 1
 albedo_color = Color(0.65098, 0.380392, 1, 0.686275)
 
 [node name="CastTimeHighlight" type="Node3D" node_paths=PackedStringArray("highlight_mesh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.35638)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 script = ExtResource("1_3hghh")
 highlight_mesh = NodePath("PurpleHighlight")
 
-[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
+[node name="HighlightMultiMesh" type="MultiMeshInstance3D" parent="."]
 multimesh = SubResource("MultiMesh_x12r3")
 script = ExtResource("2_aqp5m")
 
@@ -39,6 +39,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.435631, -0.161858, -3.4685
 visible = false
 mesh = ExtResource("2_ycols")
 surface_material_override/0 = SubResource("StandardMaterial3D_nat6n")
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.85741, 0.514634, 0, -0.514634, 0.85741, 0.00187349, 3.17456, 2.47244)

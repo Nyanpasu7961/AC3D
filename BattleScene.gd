@@ -20,7 +20,7 @@ func _ready():
 	test_skill._height_range = 1
 	
 	nav_serve._init_nav_serve(battle_map)
-	unit_holder.initialise_units(ui_control, battle_map, camera_body, nav_serve)
+	unit_holder.initialise_units(ui_control, battle_map, camera_body, nav_serve, cast_highlight)
 	combat_serve.initialise_combat_serve(nav_serve, battle_map, unit_holder)
 	
 

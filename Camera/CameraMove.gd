@@ -112,7 +112,8 @@ func change_target(unit : Unit):
 	target_position = target.global_transform.origin
 
 func follow():
-	if move_mode or !target: return
+	if target == null: return
+	
 	var from = global_transform.origin
 	target_position = target.global_transform.origin
 	
