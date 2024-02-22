@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://pssknbvqly47"]
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://pssknbvqly47"]
 
 [ext_resource type="Script" path="res://Entities/Skills/Skill.gd" id="1_bvjjc"]
+[ext_resource type="Resource" uid="uid://p3663xgoy3lv" path="res://Entities/Skills/SubMagicScaling.tres" id="1_gvsk1"]
 
 [resource]
 script = ExtResource("1_bvjjc")
-_name = "None"
+_name = "SubMagic"
 _description = "No description."
 _skill_type = 0
 _weapon_type = 0
@@ -15,8 +16,8 @@ _cast_time = 0
 _power_scaling = 1.0
 _range = 1
 _height_range = 1
-_area_length = 1
+_area_length = 3
 _area_type = 0
 _piercing = false
 _skill_effect = 0.0
-_attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([])
+_attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([ExtResource("1_gvsk1")])

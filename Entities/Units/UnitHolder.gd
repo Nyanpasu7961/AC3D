@@ -104,6 +104,7 @@ func highlight_the_area():
 	highlighted_area = highlighted_area.map(func(x): return x - selected_area)
 	
 	casth.global_position = selected_area
+	casth.global_position += Vector3(cell_size.x/2, 0, cell_size.z/2)
 	casth.set_cell_highlighters(highlighted_area)
 	
 
