@@ -43,7 +43,7 @@ class FloodCell:
 		step = s
 
 # Iterative flood fill algorithm
-func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int):
+func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int) -> Array:
 	
 	var fc_root = FloodCell.new(tile, 0)
 	
@@ -115,8 +115,8 @@ func get_border(avail_tiles : Array, unit : Unit):
 	#TODO: Fix so that it uses the avail tiles instead of unit pos for border.
 	var max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b)
 	
-	var border_max = unit.unit_cell + Vector3(move_range, jump_range, move_range)
-	var border_min = unit.unit_cell - Vector3(move_range, jump_range, move_range)
+	var border_max = unit.unit_cell + Vector3i(move_range, jump_range, move_range)
+	var border_min = unit.unit_cell - Vector3i(move_range, jump_range, move_range)
 	
 	var unique_borders = []
 	
@@ -228,6 +228,6 @@ func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
 	if _path.is_empty(): return []
 	
 	unit.path_stack = _path
-	unit._next_point = _path[0]
+	unit._next_point = _path[0] as Vector3i
 	
 	return _path

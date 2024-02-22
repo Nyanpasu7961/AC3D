@@ -10,6 +10,8 @@ var unit_holder : UnitHolder
 
 var obtained_move = false
 
+var skill_on_cast = {}
+
 func initialise_combat_serve(ns : NavService, bm : BattleMap, uh : UnitHolder):
 	nav_serve = ns
 	battle_map = bm

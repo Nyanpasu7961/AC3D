@@ -27,12 +27,12 @@ var DIRECTIONS = [Vector3.FORWARD, Vector3.BACK, Vector3.RIGHT, Vector3.LEFT]
 var cell_size
 # Cell unit is on at turn start.
 var ts_cell : Vector3i
-var unit_cell : Vector3
+var unit_cell : Vector3i
 
 var grab_next_vel = true
 var path_stack : PackedVector3Array
 var is_moving = false
-var _next_point = Vector3()
+var _next_point = Vector3i()
 
 var tested = false
 
@@ -87,15 +87,16 @@ func path_movement(delta):
 		if path_stack.is_empty():
 			is_moving = false
 			return
-		_next_point = path_stack[0]
+		_next_point = path_stack[0] as Vector3i
 
 func _move_to(local_position, delta):
 	is_moving = true
 	# Move only in terms of the xz directions.
 	var desired_velocity = local_position - unit_cell
 	
-	var adjusted_pos : Vector3 = global_position
-	adjusted_pos = translate_grid_center(adjusted_pos, false)
+	var adjusted_pos : Vector3 = translate_grid_center(global_position, false)
+	# Needed cause unit global position is translated y_pos +0.7m.
+	# Should only care about ground below unit.
 	adjusted_pos.y = floor(adjusted_pos.y)
 	
 	# y component velocity

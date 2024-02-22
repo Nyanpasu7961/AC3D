@@ -3,6 +3,7 @@ extends Node3D
 
 # Used as an API to obtain unit skills and attributes
 # Responsible for holding which units are active or not and are in battle.
+# All entities (incl. enemies) with attribute components are called Units.
 
 var ui_control : UIComponent = null
 var combat_serve : CombatService = null
@@ -17,6 +18,9 @@ var active_unit : Unit
 
 var current_selected_skill : Skill
 var selected_area : Vector3i
+var skill_avail_area : Array
+var skill_aoe : Array
+
 
 var cell_size
 
@@ -63,6 +67,7 @@ func toggle_visibility(ss : bool, ssc : bool, cc : bool):
 
 func unhighlight_skill():
 	battle_map.map_set_skill([])
+	casth.clear_highlighters()
 
 func back_to_skill_select():
 	# Enable unit movement.
@@ -74,7 +79,6 @@ func skill_select_area(skill : Skill):
 	current_selected_skill = skill
 	# Set select default to unit position.
 	selected_area = active_unit.unit_cell
-	#$"../Environment/CastTimeHighlight".set_to_cell(selected_area)
 	highlight_the_area()
 	
 	toggle_visibility(true, true, true)
@@ -83,8 +87,8 @@ func skill_select_area(skill : Skill):
 	ui_control.disconnect_all_signals_name(confirm_button, "pressed")
 	confirm_button.connect("pressed", func(): select_area_check(skill))
 	
-	var test_cells = nav_serve.grab_skill_area(active_unit, skill)
-	battle_map.map_set_skill(test_cells)
+	skill_avail_area = nav_serve.grab_skill_area(active_unit, skill)
+	battle_map.map_set_skill(skill_avail_area)
 
 func _input(event : InputEvent):
 	if not active_unit is Unit: return
@@ -92,40 +96,43 @@ func _input(event : InputEvent):
 	# Only used when selecting tiles for a skill.
 	if active_unit.skill_select and event.is_action_pressed("select_tile"):
 		if ui_control.is_hovered(): return
-		
 		selected_area = battle_map.l_transform_m(camera_body.get_mouse_position())
-		
 		highlight_the_area()
 
 func highlight_the_area():
 	# Need to change from flood fill to something simpler.
-	var highlighted_area = nav_serve.grab_skill_aoe(selected_area, current_selected_skill)
+	skill_aoe = nav_serve.grab_skill_aoe(selected_area, current_selected_skill)
 	# Translate relative to highlight position
-	highlighted_area = highlighted_area.map(func(x): return x - selected_area)
+	var highlighted_area = skill_aoe.map(func(x): return x - selected_area)
 	
 	casth.global_position = selected_area
+	# Center multimesh to grid.
 	casth.global_position += Vector3(cell_size.x/2, 0, cell_size.z/2)
 	casth.set_cell_highlighters(highlighted_area)
 	
 
-func select_is_unit() -> Unit:
-	for unit : Unit in units:
-		if selected_area == (unit.unit_cell as Vector3i):
-			return unit
-	return null
+func skill_area_has_entity() -> Array:
+	return units.filter(func(unit): return unit.unit_cell in skill_aoe)
 
 func select_area_check(skill : Skill):
-	var selected_square = select_is_unit()
-	if not selected_square is Unit: print("Invalid skill select position."); return
+	if not selected_area in skill_avail_area: print("Invalid skill select position."); return
 	
-	selected_square.deal_damage(200)
+	if not skill.has_cast():
+		var units_in_area = skill_area_has_entity()
+		if units_in_area.is_empty(): print("Invalid skill select position."); return
+		
+		for unit in units_in_area:
+			unit.deal_damage(200)
+	
+	else:
+		# Record the skill to be cast on aoe positions.
+		combat_serve.skill_on_cast[skill._name] = skill.obtain_cast_dict(skill_aoe)
 	
 	# Check if area selected is overlapped by an obstruction
 	# if nav_cells.obstructed(selected_area): skill_select_area(skill)
 	# If not, create a cast time window or deal damage to unit or blank.
 	toggle_visibility(false, false, false)
 	unhighlight_skill()
-	print(active_unit.skill_select, selected_area)
 	return
 	
 func unit_end_turn():

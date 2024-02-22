@@ -14,7 +14,7 @@ extends Resource
 @export var _jewel_cost : int = 0
 
 # AC Cast Time
-@export var _cast_time : int = 0
+@export var _cast_speed : int = 0
 
 # Power scaling in terms of percentage.
 @export var _power_scaling : float = 1.0
@@ -38,7 +38,10 @@ extends Resource
 
 
 func has_cast():
-	return _cast_time != 0
+	return _cast_speed != 0
+
+func obtain_cast_dict(aoe : Array):
+	return {"cast_time": 0, "aoe": aoe}
 
 # TODO: Still need to finish for damaging skill types
 #func apply_skill(target : Unit):
