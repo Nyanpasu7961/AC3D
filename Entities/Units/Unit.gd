@@ -116,7 +116,7 @@ func _move_to(local_position, delta):
 		unit_cell = battle_map.local_to_map(global_position)
 	
 	#l_inf norm, returns distance in terms of a geometric square.
-	var res = adjusted_pos - local_position
+	var res = adjusted_pos - (local_position as Vector3)
 	var norm = max(abs(res.x),abs(res.z))
 	
 	return norm <= ARRIVE_DISTANCE
@@ -197,4 +197,13 @@ func skill_damage(skill : Skill):
 	#print(skill.name)
 	#attr_comp.skill_damage(skill)
 	return
+
+func _obtain_basic_attack():
+	return attr_comp._main_job.basic_attack
+
+func _obtain_sub_skills():
+	return attr_comp._sub_job.sub_skills
+
+func _obtain_main_skills():
+	return attr_comp._main_job.main_skills
 

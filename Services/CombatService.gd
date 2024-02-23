@@ -21,14 +21,19 @@ func increment_clocktime():
 	#queue pop here
 	pass
 
+func set_active_unit(unit : Unit):
+	unit.is_active = true
+	unit_holder.active_unit = unit
+
 func turn_start(unit : Unit):
-	if !obtained_move:
-		var reach_tiles : Array = nav_serve.get_reachable_tiles(unit)
-		battle_map.set_movement_high(reach_tiles)
-		battle_map.set_border(nav_serve.get_border(reach_tiles, unit))
-		obtained_move = true
-		unit.is_active = true
-		unit_holder.active_unit = unit
+	var reach_tiles : Array = nav_serve.get_reachable_tiles(unit)
+	battle_map.set_movement_high(reach_tiles)
+	battle_map.set_border(nav_serve.get_border(reach_tiles, unit))
+		
+	set_active_unit(unit)
+
+func turn_end():
+	pass
 
 func apply_skill(source_unit : Unit, target_unit : Unit, skill : Skill):
 	pass

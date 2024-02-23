@@ -30,12 +30,13 @@ extends Resource
 # Ignore defense
 @export var _piercing : bool = false
 
+@export var _friendly_fire : bool = true
+
 # Overall skill damage multiplier
 @export var _skill_effect : float = 0
 
 # x_component = attribute type, y_component = scale factor
 @export var _attribute_use : Array[Scaling]
-
 
 func has_cast():
 	return _cast_speed != 0
