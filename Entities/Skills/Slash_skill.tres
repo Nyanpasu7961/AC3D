@@ -18,5 +18,6 @@ _height_range = 1
 _area_length = 1
 _area_type = 0
 _piercing = false
+_friendly_fire = true
 _skill_effect = 0.0
 _attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([])

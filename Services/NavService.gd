@@ -37,13 +37,18 @@ func get_viewable_tiles():
 class FloodCell:
 	var tile : Vector3i
 	var step : int
+	var forced_direction : Vector3i
 	
 	func _init(t, s):
 		tile = t
 		step = s
 
 # Iterative flood fill algorithm
-func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int) -> Array:
+func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int, 
+	flood_type : Utils.AreaType = Utils.AreaType.DIAMOND) -> Array:
+	
+	var directions = Utils.get_area_directions(flood_type)
+	var check_cross = Utils.is_cross(flood_type)
 	
 	var fc_root = FloodCell.new(tile, 0)
 	
@@ -70,23 +75,39 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int) -> Arr
 				blocked_jump = h-1
 				break
 		
-		for dir in DIRECTIONSi:
-			var new_t = curr_cell+dir
-			
-			for h in range(0, blocked_jump+1):
-				var added_cell = new_t + h*Vector3i.UP
-				var new_fc = FloodCell.new(added_cell, steps+1)
-				queue.push_back(new_fc)
-			
-			for h in range(0, -jump_range-1, -1):
-				var added_cell = new_t + h*Vector3i.UP
-				
-				if added_cell in nav_cells:
-					var new_fc = FloodCell.new(added_cell, steps+1)
-					queue.push_back(new_fc)
-					break
-	
+		var cells_to_check : Array
+		if check_cross and steps > 0:
+			var dir = fc.forced_direction
+			cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir, check_cross)					
+			queue.append_array(cells_to_check)
+		else:
+			for dir in directions:
+				cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir, check_cross)
+				queue.append_array(cells_to_check)
+		
 	return result.keys()
+
+func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, dir, check_cross):
+	var new_t = curr_cell + dir
+	
+	var to_push_queue = []
+	for h in range(0, blocked_jump+1):
+		var added_cell = new_t + h*Vector3i.UP
+		var new_fc = FloodCell.new(added_cell, steps+1)
+		to_push_queue.push_back(new_fc)
+			
+	for h in range(0, -jump_range-1, -1):
+		var added_cell = new_t + h*Vector3i.UP
+				
+		if added_cell in nav_cells:
+			var new_fc = FloodCell.new(added_cell, steps+1)
+			to_push_queue.push_back(new_fc)
+	
+	if check_cross: 
+		to_push_queue = to_push_queue.map(func(cell): 
+			cell.forced_direction = dir; return cell)
+	
+	return to_push_queue
 
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
@@ -158,10 +179,7 @@ func grab_skill_area(unit : Unit, skill : Skill):
 
 # TODO: Change to obtain highlights for different area types.
 func grab_skill_aoe(tile : Vector3i, skill : Skill):
-	#match skill._area_type:
-	#	Utils.AreaType.SQUARE:
-	#	Utils.AreaType.DIAMOND:
-	return cell_flood_fill(tile, max(0, skill._area_length-1), skill._height_range)
+	return cell_flood_fill(tile, max(0, skill._area_length-1), skill._height_range, skill._area_type)
 
 func initialise_astar():
 	var tile_no = nav_cells.size()
