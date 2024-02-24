@@ -6,5 +6,6 @@
 
 [resource]
 script = ExtResource("2_lr8d7")
+basic_attack = ExtResource("1_tf32i")
 main_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([ExtResource("1_tf32i")])
 sub_skills = Array[Resource("res://Entities/Skills/Skill.gd")]([ExtResource("3_awes3")])

@@ -7,6 +7,10 @@ extends GridMap
 
 @onready var skill_map : GridMap = $SkillStuff
 
+var skill_mat : StandardMaterial3D
+
+var TRANS_INCREMENT : int = 5
+
 const BORDER_OFFSET_Y : int = 5
 
 # Stores available tiles in use.

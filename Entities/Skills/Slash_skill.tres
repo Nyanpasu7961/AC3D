@@ -1,22 +1,23 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://bir7frm8t2gij"]
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://bir7frm8t2gij"]
 
 [ext_resource type="Script" path="res://Entities/Skills/Skill.gd" id="1_687je"]
-[ext_resource type="Resource" uid="uid://ci2n76hek7mcq" path="res://Entities/Skills/SlashScale.tres" id="1_t1my1"]
 
 [resource]
 script = ExtResource("1_687je")
-name = "Slash"
-description = null
-skill_type = null
-weapon_type = null
-modifiers = null
-statuses = null
-jewel_cost = null
-cast_time = null
-power_scaling = null
-range = null
-height_range = null
-area_length = null
-area_type = null
-piercing = null
-attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([ExtResource("1_t1my1")])
+_name = "Slash"
+_description = "No description."
+_skill_type = 0
+_weapon_type = 0
+_modifiers = Array[Resource("res://Entities/Attributes/AttrModifier.gd")]([])
+_statuses = Array[Resource("res://Entities/Statuses/StatusAilment.gd")]([])
+_jewel_cost = 0
+_cast_speed = 0
+_power_scaling = 1.0
+_range = 1
+_height_range = 1
+_area_length = 1
+_area_type = 0
+_piercing = false
+_friendly_fire = true
+_skill_effect = 0.0
+_attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([])

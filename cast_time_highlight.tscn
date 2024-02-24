@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3 uid="uid://dvsuixcloscsy"]
+
+[ext_resource type="Script" path="res://CastTimeHighlight.gd" id="1_3hghh"]
+[ext_resource type="PlaneMesh" uid="uid://cf3jtnl0c2shw" path="res://cast_time_highlight.tres" id="2_ycols"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_26svg"]
+transparency = 1
+shading_mode = 2
+albedo_color = Color(0.498039, 0.392157, 1, 0.52549)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_j03gv"]
+lightmap_size_hint = Vector2i(7, 7)
+material = SubResource("StandardMaterial3D_26svg")
+size = Vector2(1, 1)
+
+[sub_resource type="MultiMesh" id="MultiMesh_x12r3"]
+transform_format = 1
+mesh = SubResource("PlaneMesh_j03gv")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nat6n"]
+render_priority = 100
+transparency = 1
+albedo_color = Color(0.65098, 0.380392, 1, 0.686275)
+
+[node name="CastTimeHighlight" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+script = ExtResource("1_3hghh")
+
+[node name="HighlightMultiMesh" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("MultiMesh_x12r3")
+
+[node name="PurpleHighlight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.435631, -0.161858, -3.46854)
+visible = false
+mesh = ExtResource("2_ycols")
+surface_material_override/0 = SubResource("StandardMaterial3D_nat6n")
