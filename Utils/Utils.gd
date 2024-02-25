@@ -1,3 +1,4 @@
+extends Resource
 class_name Utils
 
 enum AttributeTypes {MAXHP, MAXJ, PATK, PDEF, MATK, MDEF, DEX, AGI, MOVE, JUMP}
@@ -6,9 +7,11 @@ enum DurationType {NONE, TURN, CLOCKTIME}
 
 enum SkillType {PHYSICAL, MAGIC, STATUS}
 enum WeaponType {SLASH, MISSILE, STRIKE}
-enum AreaType {SQUARE, CROSS, XY_CROSS, DIAMOND}
+enum AreaType {SQUARE, CROSS, XY_CROSS, DIAMOND, CHECKBOARD}
 
 enum TeamType {ALLY, ENEMY, NONE}
+
+enum Orientation {NORTH, EAST, SOUTH, WEST}
 
 const DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 const DIAGONAL_DIRECTIONS = [Vector3i(1, 0, 1), Vector3i(1, 0, -1), Vector3i(-1, 0, 1), Vector3i(-1, 0, -1)]
@@ -45,4 +48,16 @@ static func get_area_directions(type : AreaType):
 			return DIRECTIONSi
 		AreaType.DIAMOND:
 			return DIRECTIONSi
+		AreaType.CHECKBOARD:
+			return DIAGONAL_DIRECTIONS
 
+static func get_vec_orientation(ori : Orientation):
+	match ori:
+		Orientation.NORTH:
+			return Vector3i.FORWARD
+		Orientation.SOUTH:
+			return Vector3i.BACK
+		Orientation.EAST:
+			return Vector3i.RIGHT
+		Orientation.WEST:
+			return Vector3i.LEFT

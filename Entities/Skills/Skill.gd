@@ -42,7 +42,7 @@ func has_cast():
 	return _cast_speed != 0
 
 func obtain_cast_dict(aoe : Array):
-	return {"cast_time": 0, "aoe": aoe}
+	return SkillCast.new(self, aoe)
 
 # TODO: Still need to finish for damaging skill types
 #func apply_skill(target : Unit):

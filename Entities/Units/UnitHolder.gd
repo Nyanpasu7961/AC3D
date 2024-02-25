@@ -57,6 +57,11 @@ func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : N
 			child._initialise_unit_mvmt(bm, cam, control, ns)
 			units.append(child)
 
+func _change_active(unit : Unit):
+	unit.is_active = true
+	active_unit = unit
+	camera_body.target = active_unit
+
 func _main_unit_skills():
 	ui_control.skill_selection_cont.visible = true
 	ui_control.clear_skill_list()
@@ -122,9 +127,9 @@ func _highlight_the_area():
 	casth.set_cell_highlighters(highlighted_area)
 	
 
-func _skill_area_has_entity() -> Array:
+func _skill_area_has_entity(area : Array) -> Array:
 	# TODO: Change to accept all entities
-	return units.filter(func(unit): return unit.unit_cell in skill_aoe)
+	return units.filter(func(unit): return unit.unit_cell in area)
 
 func _select_area_check(skill : Skill):
 	if not selected_area in skill_avail_area: print("Invalid skill select position."); return
@@ -133,7 +138,7 @@ func _select_area_check(skill : Skill):
 		# Check if area selected is overlapped by an obstruction
 		# if nav_cells.obstructed(selected_area): skill_select_area(skill)
 		# If not, create a cast time window or deal damage to unit or blank.
-		var units_in_area = _skill_area_has_entity()
+		var units_in_area = _skill_area_has_entity(skill_aoe)
 		if units_in_area.is_empty(): print("Invalid skill select position."); return
 		
 		for unit in units_in_area:
@@ -141,7 +146,8 @@ func _select_area_check(skill : Skill):
 	
 	else:
 		# Record the skill to be cast on aoe positions.
-		combat_serve.skill_on_cast[skill] = skill.obtain_cast_dict(skill_aoe)
+		var skill_to_cast = skill.obtain_cast_dict(skill_aoe)
+		combat_serve.skill_on_cast.append(skill_to_cast)
 	
 	
 	_skill_select_inactive()
@@ -149,8 +155,11 @@ func _select_area_check(skill : Skill):
 	
 func _unit_end_turn():
 	combat_serve.turn_end()
-	print(3)
 	return
+
+func _select_orientation():
+	
+	pass
 
 # Basic attacks are treated as skills.
 func _unit_basic_attack():

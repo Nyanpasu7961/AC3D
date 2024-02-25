@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://8jkut50xi2tl"]
 
 [ext_resource type="Script" path="res://Components/Entity/EntityAttrComp.gd" id="1_6h8dn"]
-[ext_resource type="Resource" uid="uid://5kwnuj4e2rb" path="res://Entities/Jobs/knight_job.tres" id="2_1hd4e"]
+[ext_resource type="Resource" uid="uid://dassa0c0dohtb" path="res://Entities/Jobs/knight_job.tres" id="2_1hd4e"]
 [ext_resource type="Resource" uid="uid://bveteu4sq7ink" path="res://Entities/Attributes/knight_attr.tres" id="3_qgsyi"]
 
 [node name="EntityAttrComp" type="Node3D"]

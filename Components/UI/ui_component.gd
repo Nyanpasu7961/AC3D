@@ -2,15 +2,15 @@ extends Control
 class_name UIComponent
 
 @onready var control_containers = $TurnUIControl
-@onready var skill_scroll = $SkillSelection/SkillScroll
-@onready var skill_list : VBoxContainer = $SkillSelection/SkillScroll/SkillList
 
 @onready var skill_selection_cont = $SkillSelection
+@onready var skill_scroll = $SkillSelection/SkillScroll
+@onready var skill_list : VBoxContainer = $SkillSelection/SkillScroll/SkillList
 @onready var confirm_container = $SkillSelection/ConfirmHBox
 @onready var confirm_button : Button = $SkillSelection/ConfirmHBox/ConfirmButton
 @onready var back_button : Button = $SkillSelection/ConfirmHBox/BackButton
 
-
+@onready var orientation_cont = $OrientationSelection
 
 func get_act(action : String = ""):
 	if action == "": return control_containers
@@ -37,15 +37,20 @@ func disconnect_all_signals_name(button : Button, method : String):
 
 func clear_skill_list():
 	for button in skill_list.get_children():
-		button.visible = false
-		disconnect_all_signals_name(button, "pressed")
+		if button.visible:
+			disconnect_all_signals_name(button, "pressed")
+			button.visible = false
 
 func set_skill_list(skills : Array):
 	var button_pointers = []
 	
 	var button_nodes = skill_list.get_children()
-	while button_nodes.size() < skills.size():
+	
+	var button_count = button_nodes.size()
+	var skill_count = skills.size()
+	while button_count < skill_count:
 		skill_list.add_child(Button.new())
+		button_count += 1
 	
 	for i in range(skills.size()):
 		button_nodes[i].visible = true

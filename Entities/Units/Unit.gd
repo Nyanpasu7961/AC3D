@@ -14,6 +14,8 @@ var camera_comp : CameraBody
 var nav_serve : NavService
 var ui_control : UIComponent
 
+var orientation : Utils.Orientation = Utils.Orientation.NORTH
+
 # Check if the currently controlled unit is this one.
 var is_active = false
 # Check if skill area is currently being selected
@@ -207,3 +209,23 @@ func _obtain_sub_skills():
 func _obtain_main_skills():
 	return attr_comp._main_job.main_skills
 
+func _end_turn_clocktime(ct_amount : int):
+	attr_comp.clock_time -= ct_amount
+
+func _clocktime_ready(MAX_CT : int):
+	return attr_comp.clock_time >= MAX_CT
+
+# Obtain the amount of clock cycles needed to ready unit
+func _obtain_predicted():
+	var clock_cycles = 0
+	var pred_ready = attr_comp.clock_time
+	while pred_ready <= 100:
+		pred_ready += attr_comp._base_attributes.AGI *0.1
+		clock_cycles += 1
+	return clock_cycles
+
+func _get_clocktime():
+	return attr_comp.clock_time
+
+func _tick_clocktime():
+	attr_comp.tick_clock_time()

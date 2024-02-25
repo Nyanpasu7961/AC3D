@@ -7,7 +7,7 @@ extends Node3D
 @export var _main_job : Job
 @export var _sub_job : Job
 
-var clock_time : int
+var clock_time : int = 0
 
 @export var _base_attributes : Attributes
 var _stat_mods : Array[AttrMod]
