@@ -16,6 +16,7 @@ var battle_map : BattleMap
 var units = []
 var active_unit : Unit
 
+var highlighted_area : Array
 var current_selected_skill : Skill
 var selected_area : Vector3i
 var skill_avail_area : Array
@@ -119,13 +120,15 @@ func _highlight_the_area():
 	# Need to change from flood fill to something simpler.
 	skill_aoe = nav_serve.grab_skill_aoe(selected_area, current_selected_skill)
 	# Translate relative to highlight position
-	var highlighted_area = skill_aoe.map(func(x): return x - selected_area)
+	highlighted_area = skill_aoe.map(func(x): return x - selected_area)
 	
 	casth.global_position = selected_area
 	# Center multimesh to grid.
-	casth.global_position += Vector3(cell_size.x/2, 0, cell_size.z/2)
+	casth.global_position = translate_to_centre(casth.global_position)
 	casth.set_cell_highlighters(highlighted_area)
 	
+func translate_to_centre(vec : Vector3):
+	return vec + Vector3(cell_size.x/2, 0, cell_size.z/2)
 
 func _skill_area_has_entity(area : Array) -> Array:
 	# TODO: Change to accept all entities
@@ -146,15 +149,18 @@ func _select_area_check(skill : Skill):
 	
 	else:
 		# Record the skill to be cast on aoe positions.
-		var skill_to_cast = skill.obtain_cast_dict(skill_aoe)
+		var skill_to_cast = skill._obtain_cast_dict(active_unit, skill_aoe)
 		combat_serve.skill_on_cast.append(skill_to_cast)
-	
+		
+		var ch = $"../Environment/CastHandler"
+		ch.add_cast_highlighter(skill_to_cast, skill_aoe.map(translate_to_centre))
 	
 	_skill_select_inactive()
 	return
 	
 func _unit_end_turn():
 	combat_serve.turn_end()
+	_skill_select_inactive()
 	return
 
 func _select_orientation():

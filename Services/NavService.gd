@@ -63,11 +63,12 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 		var curr_cell = fc.tile
 		var steps = fc.step
 		
+		# Check if max moves exceeded.
 		if steps > move_range: continue
+		# Check if on map.
 		if curr_cell not in nav_cells: continue
-		
-		if result.has(curr_cell):
-			if result[curr_cell] <= steps: continue
+		# Check if current cell is allocated to the minimum number of steps.
+		if result.has(curr_cell) and result[curr_cell] <= steps: continue
 		
 		result[curr_cell] = steps
 		
@@ -78,18 +79,15 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 				blocked_jump = h-1
 				break
 		
-		if check_cross and steps > 0:
-			var dir = fc.forced_direction
+		# Go in the forced direction if this is the first step.
+		var dir_to_check = [fc.forced_direction] if check_cross and steps > 0 else directions
+		
+		# Flood to adjacent cells directed by dir_to_check
+		for dir in dir_to_check:
 			cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir)
 			if check_cross:
-				cells_to_check = add_cross_attribute(cells_to_check, dir)			
+				cells_to_check = add_cross_attribute(cells_to_check, dir)		
 			queue.append_array(cells_to_check)
-		else:
-			for dir in directions:
-				cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir)
-				if check_cross: 
-					cells_to_check = add_cross_attribute(cells_to_check, dir)		
-				queue.append_array(cells_to_check)
 		
 	return result.keys()
 
@@ -100,8 +98,8 @@ func add_cross_attribute(to_check : Array, dir : Vector3i):
 
 func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, dir):
 	var new_t = curr_cell + dir
-	
 	var to_push_queue = []
+	
 	for h in range(0, blocked_jump+1):
 		var added_cell = new_t + h*Vector3i.UP
 		var new_fc = FloodCell.new(added_cell, steps+1)

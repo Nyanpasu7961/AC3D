@@ -76,11 +76,13 @@ func combat_progression():
 			
 			if not turn_has_ended:
 				await turn_signal_end
-			turn_has_ended = false
 			
 			unit._end_turn_clocktime(CT_MAX)
 			
+			# Need to recheck active units in case units' CT has been changed
 			ready_units = check_active_units()
+			
+			turn_has_ended = false
 
 func unit_order_by_ct(u1 : Unit, u2 : Unit):
 	return u1._get_clocktime() > u2._get_clocktime()

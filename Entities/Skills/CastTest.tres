@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://c7jgf2an070l3"]
+
+[ext_resource type="Script" path="res://Entities/Skills/Skill.gd" id="1_iy7mr"]
+[ext_resource type="Resource" uid="uid://ci2n76hek7mcq" path="res://Entities/Skills/SlashScale.tres" id="1_ymhns"]
+
+[resource]
+script = ExtResource("1_iy7mr")
+_name = "TestCast"
+_description = "No description."
+_skill_type = 1
+_weapon_type = 1
+_modifiers = Array[Resource("res://Entities/Attributes/AttrModifier.gd")]([])
+_statuses = Array[Resource("res://Entities/Statuses/StatusAilment.gd")]([])
+_jewel_cost = 0
+_cast_speed = 1
+_power_scaling = 1.0
+_range = 3
+_height_range = 1
+_area_length = 5
+_area_type = 2
+_piercing = false
+_friendly_fire = true
+_skill_effect = 0.0
+_attribute_use = Array[Resource("res://Entities/Skills/Scaling.gd")]([ExtResource("1_ymhns")])

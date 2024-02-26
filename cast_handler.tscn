@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1nr5ugo5xnqy"]
+
+[ext_resource type="Script" path="res://CastHandler.gd" id="1_n75dj"]
+[ext_resource type="PackedScene" uid="uid://dvsuixcloscsy" path="res://cast_time_highlight.tscn" id="2_qnxjk"]
+
+[node name="CastHandler" type="Node3D" node_paths=PackedStringArray("casth_template")]
+script = ExtResource("1_n75dj")
+casth_template = NodePath("CastTimeHighlight")
+
+[node name="CastTimeHighlight" parent="." instance=ExtResource("2_qnxjk")]
+visible = false

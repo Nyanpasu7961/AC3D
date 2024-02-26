@@ -41,20 +41,27 @@ func clear_skill_list():
 			disconnect_all_signals_name(button, "pressed")
 			button.visible = false
 
+
+
 func set_skill_list(skills : Array):
 	var button_pointers = []
+	var btn_count_changed = false
 	
 	var button_nodes = skill_list.get_children()
-	
 	var button_count = button_nodes.size()
 	var skill_count = skills.size()
+	
 	while button_count < skill_count:
 		skill_list.add_child(Button.new())
 		button_count += 1
+		btn_count_changed = true
+		
+	if btn_count_changed:
+		button_nodes = skill_list.get_children()
+		btn_count_changed = false
 	
 	for i in range(skills.size()):
 		button_nodes[i].visible = true
-
 		button_nodes[i].text = skills[i]._name
 		button_pointers.append(ButtonHandler.new(button_nodes[i], skills[i]))
 

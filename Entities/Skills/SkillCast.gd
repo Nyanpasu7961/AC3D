@@ -4,6 +4,8 @@ var skill : Skill
 var cast_time : float = 0
 var aoe : Array
 
+var source : Unit = null
+
 func _init(s : Skill, area : Array):
 	skill = s
 	aoe = area
