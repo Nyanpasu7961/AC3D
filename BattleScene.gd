@@ -7,8 +7,6 @@ extends Node3D
 @onready var ui_control : UIComponent = $UICanvas/UIComponent
 @onready var unit_holder : UnitHolder = $UnitHolder
 
-@onready var cast_highlight : CastHighlight = $Environment/CastTimeHighlight
-
 var test_skill : Skill
 
 # Called when the node enters the scene tree for the first time.
@@ -16,7 +14,7 @@ func _ready():
 	camera_body.target = $UnitHolder/Unit
 	
 	nav_serve._init_nav_serve(battle_map)
-	unit_holder._initialise(ui_control, battle_map, camera_body, nav_serve, cast_highlight, combat_serve)
+	unit_holder._initialise(ui_control, battle_map, camera_body, nav_serve, combat_serve)
 	
 	combat_serve.initialise_combat_serve(nav_serve, battle_map, unit_holder)
 	

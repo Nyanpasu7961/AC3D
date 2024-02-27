@@ -7,6 +7,8 @@ extends GridMap
 
 @onready var skill_map : GridMap = $SkillStuff
 
+@onready var cast_map : CastMap = $CastHandler
+
 var skill_mat : StandardMaterial3D
 
 var TRANS_INCREMENT : int = 5
@@ -49,3 +51,18 @@ func map_set_skill(tiles : Array):
 	skill_map.clear()
 	for cell in tiles:
 		skill_map.set_cell_item(l_transform_m(cell), 0)
+
+
+## Cast Map Stuff
+func add_skill_to_cast(sc : SkillCast, tiles : Array):
+	cast_map.add_skill_to_cast(sc, tiles)
+
+func rm_skill_to_cast(sc : SkillCast):
+	cast_map.remove_skill_to_cast(sc)
+
+func clear_cast_highlighter():
+	cast_map.clear_cast_highlighter()
+
+func place_cast_highlighter(tiles : Array, clear_prev : bool = true):
+	cast_map.place_cast_highlighter(tiles, clear_prev)
+	

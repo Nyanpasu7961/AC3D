@@ -6,6 +6,8 @@ var OPACITY_SPEED = 5
 @onready var mmi : MultiMeshInstance3D = $HighlightMultiMesh
 var material : StandardMaterial3D 
 
+var skill_count = 0
+
 func _ready():
 	material = mmi.multimesh.mesh.surface_get_material(0)
 

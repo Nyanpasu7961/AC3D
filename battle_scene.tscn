@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://rysgdcqdsxkf"]
+[gd_scene load_steps=10 format=3 uid="uid://rysgdcqdsxkf"]
 
 [ext_resource type="Script" path="res://BattleScene.gd" id="1_0vlf7"]
 [ext_resource type="PackedScene" uid="uid://c3i8jspdnq5el" path="res://Components/UI/ui_component.tscn" id="2_5osb8"]
@@ -6,10 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://b2d6v2gar3raa" path="res://Map/grid_map.tscn" id="2_utyr3"]
 [ext_resource type="Script" path="res://Services/CombatService.gd" id="3_6djkd"]
 [ext_resource type="PackedScene" uid="uid://bkmpi4m63h40d" path="res://Entities/Units/Unit.tscn" id="3_nq6xp"]
-[ext_resource type="PackedScene" uid="uid://dvsuixcloscsy" path="res://cast_time_highlight.tscn" id="6_pgrtk"]
 [ext_resource type="PackedScene" uid="uid://bw27smvokg0rp" path="res://Camera/camera_move.tscn" id="6_w0s2y"]
 [ext_resource type="Script" path="res://Entities/Units/UnitHolder.gd" id="7_3qxjp"]
-[ext_resource type="PackedScene" uid="uid://c1nr5ugo5xnqy" path="res://cast_handler.tscn" id="7_b7b26"]
 [ext_resource type="Resource" uid="uid://c5udfhs246jvk" path="res://Entities/test_clocktime.tres" id="10_n4lvi"]
 
 [node name="BattleScene3D" type="Node3D"]
@@ -42,10 +40,6 @@ data = {
 metadata/_editor_floor_ = Vector3(0, 1, 0)
 
 [node name="Obstructors" type="Node3D" parent="Environment"]
-
-[node name="CastTimeHighlight" parent="Environment" instance=ExtResource("6_pgrtk")]
-
-[node name="CastHandler" parent="Environment" instance=ExtResource("7_b7b26")]
 
 [node name="CameraMove" parent="." instance=ExtResource("6_w0s2y")]
 

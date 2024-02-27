@@ -8,7 +8,6 @@ extends Node3D
 var ui_control : UIComponent = null
 var combat_serve : CombatService = null
 var nav_serve : NavService
-var casth : CastHighlight
 
 var camera_body : CameraBody
 var battle_map : BattleMap
@@ -33,12 +32,11 @@ func _input(event : InputEvent):
 		selected_area = battle_map.l_transform_m(camera_body.get_mouse_position())
 		_highlight_the_area()
 
-func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : NavService, cth : CastHighlight, cs : CombatService):
+func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : NavService, cs : CombatService):
 	ui_control = control
 	battle_map = bm
 	camera_body = cam
 	nav_serve = ns
-	casth = cth
 	combat_serve = cs
 	
 	cell_size = bm.cell_size
@@ -83,7 +81,7 @@ func _sub_unit_skills():
 
 func _unhighlight_skill():
 	battle_map.map_set_skill([])
-	casth.clear_highlighters()
+	battle_map.place_cast_highlighter([])
 
 func _back_to_skill_select():
 	# Enable unit movement.
@@ -119,13 +117,7 @@ func _skill_select_area(skill : Skill):
 func _highlight_the_area():
 	# Need to change from flood fill to something simpler.
 	skill_aoe = nav_serve.grab_skill_aoe(selected_area, current_selected_skill)
-	# Translate relative to highlight position
-	highlighted_area = skill_aoe.map(func(x): return x - selected_area)
-	
-	casth.global_position = selected_area
-	# Center multimesh to grid.
-	casth.global_position = translate_to_centre(casth.global_position)
-	casth.set_cell_highlighters(highlighted_area)
+	battle_map.place_cast_highlighter(skill_aoe)
 	
 func translate_to_centre(vec : Vector3):
 	return vec + Vector3(cell_size.x/2, 0, cell_size.z/2)
@@ -152,8 +144,7 @@ func _select_area_check(skill : Skill):
 		var skill_to_cast = skill._obtain_cast_dict(active_unit, skill_aoe)
 		combat_serve.skill_on_cast.append(skill_to_cast)
 		
-		var ch = $"../Environment/CastHandler"
-		ch.add_cast_highlighter(skill_to_cast, skill_aoe.map(translate_to_centre))
+		battle_map.add_skill_to_cast(skill_to_cast, skill_aoe)
 	
 	_skill_select_inactive()
 	return
