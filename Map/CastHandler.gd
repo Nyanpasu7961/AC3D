@@ -42,7 +42,6 @@ func _casting_tiles():
 	return used_for_cast
 
 func place_cast_highlighter(tiles : Array, clear_prev : bool = true):
-	#print(_casting_tiles())
 	tiles = tiles.filter(func(x): return not x in _casting_tiles())
 	if clear_prev:
 		_remove_cast_highlighter(prev_tiles)

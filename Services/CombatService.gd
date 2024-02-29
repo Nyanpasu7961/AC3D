@@ -60,28 +60,36 @@ func set_active_unit(unit : Unit):
 
 func check_active_units():
 	var ready_units = unit_holder.units.filter(func (x): return x._clocktime_ready(CT_MAX))
-	ready_units.sort_custom(unit_order_by_ct)
-	return ready_units
+	var ready_skills = skill_on_cast.filter(func(x): return x._ready_to_cast())
+	var ready_entities = ready_units + ready_skills
+	return ready_entities
 
 func combat_progression():
 	while true:
 		# Time-based triggers resolve here eg. Quicken/Stop
 		increment_clocktime()
 		# Check all units and skills with >= 100CT in decreasing order.
-		var ready_units = check_active_units()
+		var ready_entities = check_active_units()
 		
-		while not ready_units.is_empty():
-			var unit = ready_units.pop_front()
-			turn_start(unit)
-			
-			if not turn_has_ended:
-				await turn_signal_end
-			
-			unit._end_turn_clocktime(CT_MAX)
-			
+		while not ready_entities.is_empty():
+			var entity = ready_entities.pop_front()
+			if entity is Unit:
+				turn_start(entity)
+				
+				if not turn_has_ended:
+					await turn_signal_end
+				
+				entity._end_turn_clocktime(CT_MAX)
+				
+			if entity is SkillCast:
+				var apply_aoe = unit_holder._skill_area_has_entity(entity._aoe)
+				for cell in apply_aoe:
+					cell.deal_damage(50)
+				battle_map.rm_skill_to_cast(entity)
+				skill_on_cast.erase(entity)
+				
 			# Need to recheck active units in case units' CT has been changed
-			ready_units = check_active_units()
-			
+			ready_entities = check_active_units()
 			turn_has_ended = false
 
 func unit_order_by_ct(u1 : Unit, u2 : Unit):

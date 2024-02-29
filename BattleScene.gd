@@ -11,13 +11,9 @@ var test_skill : Skill
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	camera_body.target = $UnitHolder/Unit
-	
 	nav_serve._init_nav_serve(battle_map)
 	unit_holder._initialise(ui_control, battle_map, camera_body, nav_serve, combat_serve)
-	
 	combat_serve.initialise_combat_serve(nav_serve, battle_map, unit_holder)
-	
 	combat_serve.combat_progression()
 
 func _input(event : InputEvent):
