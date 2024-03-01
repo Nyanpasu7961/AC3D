@@ -4,6 +4,8 @@ extends Node3D
 @onready var hp_bar : TextureProgressBar = $BarViewPort/Bar
 @onready var bar_sprite : Sprite3D = $BarSprite
 
+const DECREASE_RATE = 20
+
 const BAR_DISTANCE = 0.5
 
 var attr_comp : EntityParameters
@@ -26,8 +28,10 @@ func _process(delta):
 	global_rotation = Vector3.ZERO
 	if hp_changed:
 		# TODO: Put decrease health animation here.
-		hp_bar.value = curr_hp
-		hp_changed = false
+		if hp_bar.value > curr_hp:
+			hp_bar.value = max(curr_hp, hp_bar.value-DECREASE_RATE)
+		else:
+			hp_changed = false
 
 func take_dmg(dmg : float):
 	hp_changed = true

@@ -10,7 +10,7 @@ var nav_cells : Array
 var max_height : int
 var min_height : int
 
-var current_unit : Unit
+var turn_changed = true
 
 var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 
@@ -234,9 +234,9 @@ func astar_reachable_tiles(unit : Unit):
 	
 
 func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
-	if current_unit != unit:
+	if turn_changed:
 		astar_reachable_tiles(unit)
-		current_unit = unit
+		turn_changed = false
 	
 	unit.unit_cell = battle_map.local_to_map(unit.global_position)
 	

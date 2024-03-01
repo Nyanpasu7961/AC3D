@@ -1,6 +1,8 @@
 class_name Unit
 extends CharacterBody3D
 
+signal end_movement
+
 @export var health_comp : HealthComponent
 @export var move_comp : MoveComponent
 @export var attr_comp : EntityParameters
@@ -62,7 +64,7 @@ func _process(delta):
 	pass
 
 func _input(event):
-	if !is_active or skill_select: return
+	if not is_active or skill_select: return
 	if ui_control.is_hovered(): return
 	
 	if event.is_action_pressed("select_tile"):
@@ -139,20 +141,22 @@ func check_input():
 	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
-	
+	else: _lerp_to_zero()
+		
+func _lerp_to_zero():
+	velocity.x = move_toward(velocity.x, 0, SPEED)
+	velocity.z = move_toward(velocity.z, 0, SPEED)
 
 func _physics_process(delta):
-	if not is_active or skill_select: return
+	if skill_select: return
 	
 	if not path_stack.is_empty():
 		path_movement(delta)
 	
 	if not is_moving:
 		unit_cell = battle_map.local_to_map(global_position)
-		check_input()
+		if is_active: check_input()
+		else: _lerp_to_zero()
 	
 	if velocity.x == 0 and velocity.z == 0: 
 		snap_to_grid()
@@ -165,15 +169,12 @@ func _physics_process(delta):
 	if not is_on_floor() and not is_moving: 
 		velocity.y += get_gravity()*delta
 	
-	if not is_moving:
-		tested = false
-	
 func translate_grid_center(cell : Vector3, grab_center : bool = true):
 	var t_vec = Vector3(cell_size.x/2, 0, cell_size.z/2)
 	return cell + (t_vec if grab_center else -t_vec)
 
 func force_snap_to_grid():
-	var cell = battle_map.local_to_map(global_position) as Vector3
+	var cell = battle_map.l_transform_m(global_position) as Vector3
 	var to = cell+Vector3(cell_size.x/2, 0, cell_size.z/2)
 	global_position = to
 
@@ -199,6 +200,14 @@ func skill_damage(skill : Skill):
 	#print(skill.name)
 	#attr_comp.skill_damage(skill)
 	return
+
+func _start_turn():
+	collision_mask = 3
+
+func _end_turn():
+	is_active = false
+	ts_cell = unit_cell if not is_moving else path_stack[path_stack.size()-1]
+	collision_mask = 1
 
 func _obtain_basic_attack():
 	return attr_comp._main_job.basic_attack

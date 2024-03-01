@@ -56,10 +56,7 @@ func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : N
 			child._initialise_unit_mvmt(bm, cam, control, ns)
 			units.append(child)
 
-func _change_active(unit : Unit):
-	unit.is_active = true
-	active_unit = unit
-	camera_body.target = active_unit
+
 
 func _main_unit_skills():
 	ui_control.skill_selection_cont.visible = true
@@ -90,7 +87,6 @@ func _back_to_skill_select():
 	ui_control.confirm_container.visible = false
 	
 	ui_control.disconnect_all_signals_name(ui_control.confirm_button, "pressed")
-
 
 func _skill_select_inactive():
 	active_unit.skill_select = false
@@ -148,10 +144,22 @@ func _select_area_check(skill : Skill):
 	
 	_skill_select_inactive()
 	return
-	
+
+func _change_active(unit : Unit):
+	unit.is_active = true
+	active_unit = unit
+	print(active_unit.name)
+	camera_body.target = active_unit
+
+func _end_active():
+	active_unit._end_turn()
+	active_unit = null
+
 func _unit_end_turn():
-	combat_serve.turn_end()
 	_skill_select_inactive()
+	_end_active()
+	combat_serve.turn_end()
+	nav_serve.turn_changed = true
 	return
 
 func _select_orientation():

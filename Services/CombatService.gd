@@ -45,17 +45,13 @@ func turn_start(unit : Unit):
 	set_active_unit(unit)
 	
 func turn_end():
-	set_inactive_unit()
 	turn_has_ended = true
 	turn_signal_end.emit()
-
-func set_inactive_unit():
-	unit_holder.active_unit.is_active = false
-	unit_holder.active_unit = null
 	change_active = true
 
 func set_active_unit(unit : Unit):
 	unit_holder._change_active(unit)
+	unit._start_turn()
 	change_active = false
 
 func check_active_units():
