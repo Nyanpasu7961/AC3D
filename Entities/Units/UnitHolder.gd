@@ -15,21 +15,21 @@ var battle_map : BattleMap
 var units = []
 var active_unit : Unit
 
-var highlighted_area : Array
-var current_selected_skill : Skill
-var selected_area : Vector3i
-var skill_avail_area : Array
-var skill_aoe : Array
+# Keeps track of selected skills and squares.
+# Kept as global to reduce calls to flood cell in NavServe.
+var _current_selected_skill : Skill
+var _selected_cell : Vector3i
+var _skill_avail_area : Array
+var _skill_aoe  : Array
 
 var cell_size
 
 func _input(event : InputEvent):
 	if not active_unit is Unit: return
-	
 	# Only used when selecting tiles for a skill.
 	if active_unit.skill_select and event.is_action_pressed("select_tile"):
 		if ui_control.is_hovered(): return
-		selected_area = battle_map.l_transform_m(camera_body.get_mouse_position())
+		_selected_cell = battle_map.l_transform_m(camera_body.get_mouse_position())
 		_highlight_the_area()
 
 func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : NavService, cs : CombatService):
@@ -44,6 +44,7 @@ func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : N
 	# load unit information here
 	# load_units(path)
 	
+	# Setup UI buttons to interact with unit attributes and skills.
 	ui_control.get_act("MSkills").connect("pressed", Callable(self,"_main_unit_skills"))
 	ui_control.get_act("SSkills").connect("pressed", Callable(self,"_sub_unit_skills"))
 	ui_control.get_act("EndTurn").connect("pressed",Callable(self,"_unit_end_turn"))
@@ -56,25 +57,21 @@ func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : N
 			child._initialise_unit_mvmt(bm, cam, control, ns)
 			units.append(child)
 
-
+func _prepare_ui_skills(skills : Array):
+	ui_control.skill_scroll.visible = true
+	ui_control.skill_selection_cont.visible = true
+	ui_control.clear_skill_list()
+	
+	var buttons = ui_control.set_skill_list(skills)
+	for h in buttons:
+		h.button.connect("pressed", func(): _skill_select_area(h.skill))
+	_back_to_skill_select()
 
 func _main_unit_skills():
-	ui_control.skill_selection_cont.visible = true
-	ui_control.clear_skill_list()
-	var skills = active_unit._obtain_main_skills()
-	var buttons = ui_control.set_skill_list(skills)
-	for h in buttons:
-		h.button.connect("pressed", func(): _skill_select_area(h.skill))
-	_back_to_skill_select()
-
+	_prepare_ui_skills(active_unit._obtain_main_skills())
+	
 func _sub_unit_skills():
-	ui_control.skill_selection_cont.visible = true
-	ui_control.clear_skill_list()
-	var skills = active_unit._obtain_sub_skills()
-	var buttons = ui_control.set_skill_list(skills)
-	for h in buttons:
-		h.button.connect("pressed", func(): _skill_select_area(h.skill))
-	_back_to_skill_select()
+	_prepare_ui_skills(active_unit._obtain_sub_skills())
 
 func _unhighlight_skill():
 	battle_map.map_set_skill([])
@@ -88,48 +85,43 @@ func _back_to_skill_select():
 	
 	ui_control.disconnect_all_signals_name(ui_control.confirm_button, "pressed")
 
-func _skill_select_inactive():
-	active_unit.skill_select = false
-	ui_control.skill_selection_cont.visible = false
-	ui_control.confirm_container.visible = false
-	_unhighlight_skill()
-
 func _skill_select_area(skill : Skill):
 	active_unit.skill_select = true
 	ui_control.confirm_container.visible = true
 	
-	current_selected_skill = skill
+	_current_selected_skill = skill
 	# Set selection default to unit position.
-	selected_area = active_unit.unit_cell
+	_selected_cell = active_unit.unit_cell
 	_highlight_the_area()
 	
 	var confirm_button = ui_control.confirm_button
 	ui_control.disconnect_all_signals_name(confirm_button, "pressed")
 	confirm_button.connect("pressed", func(): _select_area_check(skill))
 	
-	skill_avail_area = nav_serve.grab_skill_area(active_unit, skill)
-	battle_map.map_set_skill(skill_avail_area)
+	_skill_avail_area = nav_serve.grab_skill_area(active_unit, skill)
+	battle_map.map_set_skill(_skill_avail_area)
 
 func _highlight_the_area():
 	# Need to change from flood fill to something simpler.
-	skill_aoe = nav_serve.grab_skill_aoe(selected_area, current_selected_skill)
-	battle_map.place_cast_highlighter(skill_aoe)
+	# Meh, its probably fast enough though.
+	_skill_aoe  = nav_serve.grab_skill_aoe (_selected_cell, _current_selected_skill)
+	battle_map.place_cast_highlighter(_skill_aoe )
 	
 func translate_to_centre(vec : Vector3):
-	return vec + Vector3(cell_size.x/2, 0, cell_size.z/2)
+	return vec + battle_map.grid_translate
 
 func _skill_area_has_entity(area : Array) -> Array:
 	# TODO: Change to accept all entities
 	return units.filter(func(unit): return unit.unit_cell in area)
 
 func _select_area_check(skill : Skill):
-	if not selected_area in skill_avail_area: print("Invalid skill select position."); return
+	if not _selected_cell in _skill_avail_area: print("Invalid skill select position."); return
 	
 	if not skill.has_cast():
 		# Check if area selected is overlapped by an obstruction
-		# if nav_cells.obstructed(selected_area): skill_select_area(skill)
+		# if nav_cells.obstructed(_selected_cell): skill_select_area(skill)
 		# If not, create a cast time window or deal damage to unit or blank.
-		var units_in_area = _skill_area_has_entity(skill_aoe)
+		var units_in_area = _skill_area_has_entity(_skill_aoe)
 		if units_in_area.is_empty(): print("Invalid skill select position."); return
 		
 		for unit in units_in_area:
@@ -137,13 +129,19 @@ func _select_area_check(skill : Skill):
 	
 	else:
 		# Record the skill to be cast on aoe positions.
-		var skill_to_cast = skill._obtain_cast_dict(active_unit, skill_aoe)
+		var skill_to_cast = skill._obtain_cast_dict(active_unit, _skill_aoe )
 		combat_serve.skill_on_cast.append(skill_to_cast)
-		
-		battle_map.add_skill_to_cast(skill_to_cast, skill_aoe)
+		battle_map.add_skill_to_cast(skill_to_cast, _skill_aoe )
 	
 	_skill_select_inactive()
+	_unit_end_turn()
 	return
+
+func _skill_select_inactive():
+	active_unit.skill_select = false
+	ui_control.skill_selection_cont.visible = false
+	ui_control.confirm_container.visible = false
+	_unhighlight_skill()
 
 func _change_active(unit : Unit):
 	unit.is_active = true
@@ -168,8 +166,7 @@ func _select_orientation():
 
 # Basic attacks are treated as skills.
 func _unit_basic_attack():
+	ui_control.skill_selection_cont.visible = true
 	ui_control.skill_scroll.visible = false
 	var battack = active_unit._obtain_basic_attack()
 	_skill_select_area(battack)
-	print(4)
-	return

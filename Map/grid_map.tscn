@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b2d6v2gar3raa"]
+[gd_scene load_steps=9 format=3 uid="uid://b2d6v2gar3raa"]
 
 [ext_resource type="MeshLibrary" uid="uid://blsb1ottgv77w" path="res://TileWorld/Tiles/VisibleBlocks/base_block.tres" id="1_1fx3s"]
 [ext_resource type="Script" path="res://Map/grid_map.gd" id="2_js2qe"]
@@ -7,6 +7,7 @@
 [ext_resource type="MeshLibrary" uid="uid://bongb5lv8ajp0" path="res://TileWorld/Tiles/Highlighters/HighlightTiles.tres" id="5_d1ain"]
 [ext_resource type="MeshLibrary" uid="uid://brpmhvbn5p40x" path="res://casttime_purple.tres" id="6_c7rd7"]
 [ext_resource type="Script" path="res://Map/CastHandler.gd" id="7_etvm1"]
+[ext_resource type="PackedScene" uid="uid://cokldjeirnt0k" path="res://TileWorld/Tiles/Highlighters/base_highlighter.tscn" id="8_bew4f"]
 
 [node name="BattleMap" type="GridMap"]
 mesh_library = ExtResource("1_1fx3s")
@@ -28,14 +29,6 @@ data = {
 "cells": PackedInt32Array(3, 0, 0, 3, 1, 0, 3, 2, 0)
 }
 metadata/_editor_floor_ = Vector3(0, 1, 0)
-
-[node name="HoverHighlight" type="GridMap" parent="."]
-mesh_library = ExtResource("3_jvci0")
-cell_size = Vector3(1, 1, 1)
-cell_center_y = false
-collision_layer = 0
-collision_mask = 0
-metadata/_editor_floor_ = Vector3(0, 2, 0)
 
 [node name="MoveHighlight" type="GridMap" parent="."]
 mesh_library = ExtResource("3_jvci0")
@@ -60,3 +53,6 @@ mesh_library = ExtResource("6_c7rd7")
 cell_size = Vector3(1, 1, 1)
 cell_center_y = false
 script = ExtResource("7_etvm1")
+
+[node name="HoverHighlight" parent="." instance=ExtResource("8_bew4f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)

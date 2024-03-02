@@ -4,7 +4,8 @@ extends Node3D
 @onready var hp_bar : TextureProgressBar = $BarViewPort/Bar
 @onready var bar_sprite : Sprite3D = $BarSprite
 
-const DECREASE_RATE = 20
+const DECREASE_RATE = 0.05
+var damage_taken : float = 0
 
 const BAR_DISTANCE = 0.5
 
@@ -29,13 +30,14 @@ func _process(delta):
 	if hp_changed:
 		# TODO: Put decrease health animation here.
 		if hp_bar.value > curr_hp:
-			hp_bar.value = max(curr_hp, hp_bar.value-DECREASE_RATE)
+			hp_bar.value = max(curr_hp, hp_bar.value-DECREASE_RATE*damage_taken)
 		else:
 			hp_changed = false
 
 func take_dmg(dmg : float):
 	hp_changed = true
 	curr_hp -= dmg
+	damage_taken = dmg
 	print(curr_hp)
 	if curr_hp <= 0:
 		print("death")

@@ -8,7 +8,7 @@ signal end_movement
 @export var attr_comp : EntityParameters
 
 const SPEED = 5.0
-const AUTO_SPEED = 5.0
+const AUTO_SPEED = 10.0
 const JUMP_VELOCITY = 2.0
 
 var battle_map : GridMap
@@ -128,10 +128,10 @@ func _move_to(local_position, delta):
 func check_input():
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	
 	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_just_pressed("move_jump") and is_on_floor():
 		velocity.y = move_comp.jump_vel
 	
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y))
@@ -201,13 +201,18 @@ func skill_damage(skill : Skill):
 	#attr_comp.skill_damage(skill)
 	return
 
+func _toggle_borders(b_toggle : bool):
+	if b_toggle: collision_mask |= 0b10
+	else: collision_mask &= ~(0b10)
+	#print(collision_mask)
+
 func _start_turn():
-	collision_mask = 3
+	_toggle_borders(true)
 
 func _end_turn():
 	is_active = false
 	ts_cell = unit_cell if not is_moving else path_stack[path_stack.size()-1]
-	collision_mask = 1
+	_toggle_borders(false)
 
 func _obtain_basic_attack():
 	return attr_comp._main_job.basic_attack
