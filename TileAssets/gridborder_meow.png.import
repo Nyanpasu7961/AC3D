@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btsf7jmqhi4f2"
-path.s3tc="res://.godot/imported/gridborderg.png-15a8bf10326477dadcfdbba70b2a36be.s3tc.ctex"
+uid="uid://dd3besje27yts"
+path.s3tc="res://.godot/imported/gridborder_meow.png-0e2d76fc5b9b95292238da8b9b9abb31.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://TileAssets/gridborderg.png"
-dest_files=["res://.godot/imported/gridborderg.png-15a8bf10326477dadcfdbba70b2a36be.s3tc.ctex"]
+source_file="res://TileAssets/gridborder_meow.png"
+dest_files=["res://.godot/imported/gridborder_meow.png-0e2d76fc5b9b95292238da8b9b9abb31.s3tc.ctex"]
 
 [params]
 

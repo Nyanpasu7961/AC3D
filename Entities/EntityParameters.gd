@@ -1,23 +1,36 @@
-class_name EntityAttrComp
-extends Node3D
+class_name EntityParameters
+extends Resource
 
-# Change to unit stats file to set attributes
-# var stats_file = preload("res://addons/godot-jolt/LICENSE.txt")
+var _entity_id : int = 0
 
 @export var _main_job : Job
 @export var _sub_job : Job
-
-var clock_time : int = 0
-
 @export var _base_attributes : Attributes
+
+var ct_attributes : CTAttributes = null
+
 var _stat_mods : Array[AttrMod]
 var _collated_mods : Dictionary
 
 var _is_dirty : bool = true
 var final_stats
 
+func initialise(entity):
+	ct_attributes = CTAttributes.new(entity)
+	ct_attributes.set_clocktime_add(_base_attributes.AGI*0.1)
+
+func _clocktime_ready():
+	return ct_attributes._clocktime_ready()
+
+func set_clocktime(ct : float):
+	ct_attributes.set_clocktime_add(ct)
+
+func _obtain_predicted_clocktime():
+	ct_attributes._obtain_predicted_clocktime()
+	return ct_attributes
+
 func tick_clock_time() -> void:
-	clock_time += _base_attributes.AGI*0.1
+	ct_attributes.tick_clock_time()
 
 func add_modifier(mod : AttrMod) -> void:
 	_is_dirty = true
@@ -48,4 +61,3 @@ func order_modifiers(a : AttrMod, b : AttrMod):
 
 func sort_modifiers():
 	_stat_mods.sort_custom(order_modifiers)
-

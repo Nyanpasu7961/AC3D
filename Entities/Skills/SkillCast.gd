@@ -1,34 +1,33 @@
 class_name SkillCast
 
+var _id : int = 0
 var _skill : Skill
-var _cast_time : float = 0
 var _aoe : Array
 
+var _ct_attributes : CTAttributes
 
 func _init(s : Skill, area : Array):
 	_skill = s
 	_aoe = area
+	
+	_ct_attributes = CTAttributes.new(self)
+	_ct_attributes.set_clocktime_add(_skill._cast_speed)
 
 func _get_clocktime():
-	return _cast_time
+	return _ct_attributes.clock_time
 
 func _get_source():
 	return _skill._source
 
 func _tick_cast_time():
-	_cast_time += _skill._cast_speed
+	_ct_attributes.tick_clock_time()
 
-func _ready_to_cast():
-	return _cast_time >= 100
+func _clocktime_ready():
+	return _ct_attributes._clocktime_ready()
 
 # Obtain the amount of clock cycles needed to ready _skill
 func _obtain_predicted():
-	var clock_cycles = 0
-	var pred_cast = _cast_time
-	while pred_cast <= 1000:
-		pred_cast += _skill._cast_speed
-		clock_cycles += 1
-	return clock_cycles
+	return _ct_attributes._obtain_predicted_clocktime()
 
 func _apply_skill():
 	pass

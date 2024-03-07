@@ -43,7 +43,7 @@ func clear_skill_list():
 
 
 
-func set_skill_list(skills : Array):
+func set_skill_list(skills : Array, skill_func : Callable):
 	var button_pointers = []
 	var btn_count_changed = false
 	
@@ -61,8 +61,7 @@ func set_skill_list(skills : Array):
 		btn_count_changed = false
 	
 	for i in range(skills.size()):
-		button_nodes[i].visible = true
-		button_nodes[i].text = skills[i]._name
-		button_pointers.append(ButtonHandler.new(button_nodes[i], skills[i]))
-
-	return button_pointers
+		var skill_button = button_nodes[i]
+		skill_button.visible = true
+		skill_button.text = skills[i]._name
+		skill_button.connect("pressed", skill_func.bind(skills[i]))

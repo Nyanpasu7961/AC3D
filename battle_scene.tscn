@@ -44,11 +44,15 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.35271)
 script = ExtResource("7_3qxjp")
 
-[node name="Unit2" parent="UnitHolder" instance=ExtResource("3_nq6xp")]
+[node name="Unit2" parent="UnitHolder" node_paths=PackedStringArray("health_comp", "move_comp") instance=ExtResource("3_nq6xp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.48231, 1.34852, -0.163158)
+health_comp = NodePath("")
+move_comp = NodePath("")
 
-[node name="Unit" parent="UnitHolder" instance=ExtResource("3_nq6xp")]
+[node name="Unit" parent="UnitHolder" node_paths=PackedStringArray("health_comp", "move_comp") instance=ExtResource("3_nq6xp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, 2.51217)
+health_comp = NodePath("")
+move_comp = NodePath("")
 attr_comp = ExtResource("10_n4lvi")
 
 [editable path="Environment/BattleMap"]

@@ -26,23 +26,25 @@ func clear_cast_highlighter():
 	clear()
 
 func remove_skill_to_cast(sc : SkillCast):
-	_remove_cast_highlighter(casting_tiles[sc])
-	#casting_tiles.erase(sc)
 	has_changed = true
+	var tiles_to_remove = casting_tiles[sc._id]
+	casting_tiles.erase(sc._id)
+	_remove_cast_highlighter(tiles_to_remove)
 
 func add_skill_to_cast(sc : SkillCast, tiles : Array):
-	casting_tiles[sc] = tiles
-	place_cast_highlighter(tiles, false)
+	casting_tiles[sc._id] = tiles
 	has_changed = true
+	place_cast_highlighter(tiles, false)
 
 func _casting_tiles():
 	if has_changed:
-		used_for_cast = casting_tiles.values().reduce(func(a, b): return a + b, [])
+		used_for_cast = casting_tiles.values().reduce(func(a, b): 
+			a.append_array(b); return a, [])
 		has_changed = false
-	return used_for_cast
 
 func place_cast_highlighter(tiles : Array, clear_prev : bool = true):
-	tiles = tiles.filter(func(x): return not x in _casting_tiles())
+	_casting_tiles()
+	tiles = tiles.filter(func(x): return not x in used_for_cast)
 	if clear_prev:
 		_remove_cast_highlighter(prev_tiles)
 		prev_tiles = tiles
@@ -57,7 +59,10 @@ func _add_cast_highlighter(tiles : Array):
 		set_cell_item(cell, 0)
 
 func _remove_cast_highlighter(tiles : Array):
+	
+	_casting_tiles()
 	for cell in tiles:
+		if cell in used_for_cast: continue
 		set_cell_item(cell, -1)
 		
 	if get_used_cells().size() <= 0:

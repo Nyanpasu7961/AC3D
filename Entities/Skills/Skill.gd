@@ -45,7 +45,7 @@ func has_cast():
 func _obtain_cast_dict(unit : Unit, aoe : Array):
 	var skill_copy : Skill = self.duplicate()
 	skill_copy._set_source(unit)
-	return SkillCast.new(skill_copy, aoe)
+	return SkillCastConstructor.get_instance().create_skillcast(skill_copy, aoe)
 
 func _set_source(unit : Unit):
 	_source = unit

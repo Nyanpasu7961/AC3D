@@ -26,11 +26,15 @@ var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEF
 var grid_translate = Vector3(cell_size.x/2, 0, cell_size.z/2)
 var hover_translate = Vector3.UP*0.02
 
+func tile_translate(tile : Vector3, grab_center : bool = true):
+	var res = snapped(tile-grid_translate, cell_size)
+	if grab_center: res += grid_translate
+	return res
+
 func set_hover(tile : Vector3):
 	var highlight_tile = l_transform_m(tile)
 	if highlight_tile in nav_cells:
-		hover_high.global_position = snapped(tile-grid_translate, cell_size)+grid_translate
-		hover_high.global_position += hover_translate
+		hover_high.global_position = tile_translate(tile) + hover_translate
 
 func set_movement_high(cell_list : Array):
 	move_high.clear()

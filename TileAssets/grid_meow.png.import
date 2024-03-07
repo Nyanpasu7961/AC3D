@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btsf7jmqhi4f2"
-path.s3tc="res://.godot/imported/gridborderg.png-15a8bf10326477dadcfdbba70b2a36be.s3tc.ctex"
+uid="uid://dn4gcixt1d3i0"
+path.s3tc="res://.godot/imported/grid_meow.png-d4db9ff9fd4d887dca1c7059f69d021d.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://TileAssets/gridborderg.png"
-dest_files=["res://.godot/imported/gridborderg.png-15a8bf10326477dadcfdbba70b2a36be.s3tc.ctex"]
+source_file="res://TileAssets/grid_meow.png"
+dest_files=["res://.godot/imported/grid_meow.png-d4db9ff9fd4d887dca1c7059f69d021d.s3tc.ctex"]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

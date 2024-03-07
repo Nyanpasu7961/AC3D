@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="EntityParameters" load_steps=5 format=3 uid="uid://c5udfhs246jvk"]
 
-[ext_resource type="Script" path="res://Entities/EntityResource.gd" id="1_65wmi"]
+[ext_resource type="Script" path="res://Entities/EntityParameters.gd" id="1_65wmi"]
 [ext_resource type="Script" path="res://Entities/Attributes/Attributes.gd" id="1_xllvf"]
 [ext_resource type="Resource" uid="uid://dassa0c0dohtb" path="res://Entities/Jobs/knight_job.tres" id="2_r0jj0"]
 
@@ -10,7 +10,7 @@ MAXHP = 500.0
 MAXJ = 0.0
 PATK = 30.0
 PDEF = 0.0
-AGI = 20.0
+AGI = 200.0
 DEX = 0.0
 MOVE = 6
 JUMP = 5

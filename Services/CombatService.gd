@@ -6,7 +6,6 @@ signal turn_signal_end
 
 var CT_MAX : int = 100
 
-var ready_units : Array = []
 var change_active : bool = true
 
 var turn_count : int = 0
@@ -21,7 +20,14 @@ var unit_holder : UnitHolder
 
 var obtained_move = false
 
+var units = []
 var skill_on_cast = []
+
+func _units_in_area(area : Array) -> Array:
+	return units.filter(func(unit): return unit.ts_cell in area)
+
+func add_units(us : Array):
+	units.append_array(us)
 
 func initialise_combat_serve(ns : NavService, bm : BattleMap, uh : UnitHolder):
 	nav_serve = ns
@@ -54,11 +60,30 @@ func set_active_unit(unit : Unit):
 	unit._start_turn()
 	change_active = false
 
+func _sort_by_prediction(a : CTAttributes, b : CTAttributes):
+	if a.clock_cycles == b.clock_cycles:
+		return a.pred_ready_ct >= b.pred_ready_ct
+	return a.clock_cycles > b.clock_cycles
+
+#func temp_pred_sort(a : TempPredHolder, b : TempPredHolder):
+#	
+		
+# Obtains the predicted number of clock cycles required for a unit/skill to be ready.
+# This is to be displayed on UI on the top-right screen.
+func obtain_timeclock_pred():
+	var ready_pred = units.map(func (x): return x._obtain_predicted())
+	var ready_s_pred = skill_on_cast.map(func(x): return x._obtain_predicted())
+	ready_pred.append_array(ready_s_pred)
+	ready_pred.sort_custom(_sort_by_prediction)
+	return ready_pred
+
 func check_active_units():
-	var ready_units = unit_holder.units.filter(func (x): return x._clocktime_ready(CT_MAX))
-	var ready_skills = skill_on_cast.filter(func(x): return x._ready_to_cast())
-	var ready_entities = ready_units + ready_skills
+	var ready_entities = units.filter(func (x): return x._clocktime_ready())
+	var ready_skills = skill_on_cast.filter(func(x): return x._clocktime_ready())
+	ready_entities.append_array(ready_skills)
+	ready_entities.sort_custom(order_by_ct)
 	return ready_entities
+
 
 func combat_progression():
 	while true:
@@ -75,7 +100,7 @@ func combat_progression():
 				if not turn_has_ended:
 					await turn_signal_end
 				
-				entity._end_turn_clocktime(CT_MAX)
+				entity._end_turn_clocktime(0)
 				
 			if entity is SkillCast:
 				var apply_aoe = unit_holder._skill_area_has_entity(entity._aoe)
@@ -88,11 +113,11 @@ func combat_progression():
 			ready_entities = check_active_units()
 			turn_has_ended = false
 
-func unit_order_by_ct(u1 : Unit, u2 : Unit):
+func order_by_ct(u1, u2):
 	return u1._get_clocktime() > u2._get_clocktime()
 
 func increment_clocktime():
-	for unit : Unit in unit_holder.units:
+	for unit : Unit in units:
 		unit._tick_clocktime()
 	for sc : SkillCast in skill_on_cast:
 		sc._tick_cast_time()

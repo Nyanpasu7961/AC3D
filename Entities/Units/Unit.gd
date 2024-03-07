@@ -1,17 +1,13 @@
 class_name Unit
-extends CharacterBody3D
+extends Entity
 
 signal end_movement
-
-@export var health_comp : HealthComponent
-@export var move_comp : MoveComponent
-@export var attr_comp : EntityParameters
 
 const SPEED = 5.0
 const AUTO_SPEED = 10.0
 const JUMP_VELOCITY = 2.0
 
-var battle_map : GridMap
+var battle_map : BattleMap
 var camera_comp : CameraBody
 var nav_serve : NavService
 var ui_control : UIComponent
@@ -23,12 +19,6 @@ var is_active = false
 # Check if skill area is currently being selected
 var skill_select = false
 
-var map_id
-
-var DIRECTIONS = [Vector3.FORWARD, Vector3.BACK, Vector3.RIGHT, Vector3.LEFT]
-
-
-var cell_size
 # Cell unit is on at turn start.
 var ts_cell : Vector3i
 var unit_cell : Vector3i
@@ -38,12 +28,8 @@ var path_stack : PackedVector3Array
 var is_moving = false
 var _next_point = Vector3i()
 
-var tested = false
-
 # Square of length 0.25m
 const ARRIVE_DISTANCE = 0.25
-
-var height_scale : float = 1
 
 func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody, uc : UIComponent, ns : NavService):
 	battle_map = bm
@@ -51,16 +37,14 @@ func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody, uc : UIComponent, n
 	ui_control = uc
 	nav_serve = ns
 	
-	health_comp.initialise_health_comp(attr_comp)
+	attr_comp.initialise(self)
+	health_comp.initialise_health_comp(attr_comp, cam)
 	move_comp.initialise_move_comp(attr_comp)
 	
-	cell_size = battle_map.cell_size
 	ts_cell = battle_map.local_to_map(global_position)
-	map_id = battle_map.get_instance_id()
 	unit_cell = battle_map.local_to_map(global_position)
 
 func _process(delta):
-	adjust_healthbar()
 	pass
 
 func _input(event):
@@ -72,16 +56,7 @@ func _input(event):
 		if mouse_tile:
 			nav_serve.astar_unit_path(self, battle_map.l_transform_m(mouse_tile))
 
-func adjust_healthbar():
-	var cam_rot = camera_comp.pivot.rotation
-	var rot_x = snapped(cam_rot.x, 0.01)
-	var rot_y = snapped(cam_rot.y, 0.01)
-	
-	var bar_pos = lerp(Vector3(0, health_comp.BAR_DISTANCE, 0),Vector3(0, 0, health_comp.BAR_DISTANCE), 2*rot_x/PI)
-	health_comp.bar_sprite.position = (bar_pos).rotated(Vector3.UP, rot_y)
 
-func get_gravity() -> float:
-	return height_scale*(move_comp.jump_gravity if velocity.y > 0 else move_comp.fall_gravity)
 
 func path_movement(delta):
 	var arrived_to_next_point = _move_to(_next_point, delta)
@@ -98,9 +73,9 @@ func _move_to(local_position, delta):
 	# Move only in terms of the xz directions.
 	var desired_velocity = local_position - unit_cell
 	
-	var adjusted_pos : Vector3 = translate_grid_center(global_position, false)
 	# Needed cause unit global position is translated y_pos +0.7m.
 	# Should only care about ground below unit.
+	var adjusted_pos = battle_map.tile_translate(global_position, false)
 	adjusted_pos.y = floor(adjusted_pos.y)
 	
 	# y component velocity
@@ -117,6 +92,7 @@ func _move_to(local_position, delta):
 		velocity.y += get_gravity()*delta
 	
 	if desired_velocity.y != 0 and is_on_floor():
+		# Update position.
 		unit_cell = battle_map.local_to_map(global_position)
 	
 	#l_inf norm, returns distance in terms of a geometric square.
@@ -168,21 +144,13 @@ func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor() and not is_moving: 
 		velocity.y += get_gravity()*delta
-	
-func translate_grid_center(cell : Vector3, grab_center : bool = true):
-	var t_vec = Vector3(cell_size.x/2, 0, cell_size.z/2)
-	return cell + (t_vec if grab_center else -t_vec)
 
-func force_snap_to_grid():
-	var cell = battle_map.l_transform_m(global_position) as Vector3
-	var to = cell+Vector3(cell_size.x/2, 0, cell_size.z/2)
-	global_position = to
 
 # Readjusts unit to nearest grid position.
 func snap_to_grid():
 	var cell = battle_map.local_to_map(global_position) as Vector3
 	var from = Vector3(global_position.x, cell.y, global_position.z)
-	var to = cell+Vector3(cell_size.x/2, 0, cell_size.z/2)
+	var to = battle_map.tile_translate(cell)
 	var dist = from.distance_to(to)
 	
 	if dist < 0.05: return
@@ -190,10 +158,6 @@ func snap_to_grid():
 	var vel = (to-from)*SPEED
 	velocity.x += vel.x
 	velocity.z += vel.z
-
-func deal_damage(dmg : float):
-	print("ouch")
-	health_comp.take_dmg(dmg)
 
 func skill_damage(skill : Skill):
 	# Show AOE
@@ -223,23 +187,18 @@ func _obtain_sub_skills():
 func _obtain_main_skills():
 	return attr_comp._main_job.main_skills
 
-func _end_turn_clocktime(ct_amount : int):
-	attr_comp.clock_time -= ct_amount
+func _end_turn_clocktime(turn_type : int):
+	attr_comp.ct_attributes.end_turn(turn_type)
 
-func _clocktime_ready(MAX_CT : int):
-	return attr_comp.clock_time >= MAX_CT
+func _clocktime_ready():
+	return attr_comp._clocktime_ready()
 
 # Obtain the amount of clock cycles needed to ready unit
 func _obtain_predicted():
-	var clock_cycles = 0
-	var pred_ready = attr_comp.clock_time
-	while pred_ready <= 100:
-		pred_ready += attr_comp._base_attributes.AGI *0.1
-		clock_cycles += 1
-	return clock_cycles
+	return attr_comp._obtain_predicted_clocktime()
 
 func _get_clocktime():
-	return attr_comp.clock_time
+	return attr_comp.ct_attributes.clock_time
 
 func _tick_clocktime():
 	attr_comp.tick_clock_time()

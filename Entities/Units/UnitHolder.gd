@@ -12,7 +12,6 @@ var nav_serve : NavService
 var camera_body : CameraBody
 var battle_map : BattleMap
 
-var units = []
 var active_unit : Unit
 
 # Keeps track of selected skills and squares.
@@ -41,9 +40,6 @@ func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : N
 	
 	cell_size = bm.cell_size
 	
-	# load unit information here
-	# load_units(path)
-	
 	# Setup UI buttons to interact with unit attributes and skills.
 	ui_control.get_act("MSkills").connect("pressed", Callable(self,"_main_unit_skills"))
 	ui_control.get_act("SSkills").connect("pressed", Callable(self,"_sub_unit_skills"))
@@ -51,20 +47,17 @@ func _initialise(control : UIComponent, bm : BattleMap, cam : CameraBody, ns : N
 	ui_control.get_act("Attack").connect("pressed",Callable(self,"_unit_basic_attack"))
 	ui_control.back_button.connect("pressed", Callable(self, "_back_to_skill_select"))
 	
-	# Change when loading units from file
-	for child in get_children():
-		if child is Unit:
-			child._initialise_unit_mvmt(bm, cam, control, ns)
-			units.append(child)
+	# Load units into the combat service.
+	var units = get_children().filter(func(x): return x is Unit)
+	for us in units:
+		us._initialise_unit_mvmt(bm, cam, control, ns)
+	combat_serve.add_units(units)
 
 func _prepare_ui_skills(skills : Array):
 	ui_control.skill_scroll.visible = true
 	ui_control.skill_selection_cont.visible = true
 	ui_control.clear_skill_list()
-	
-	var buttons = ui_control.set_skill_list(skills)
-	for h in buttons:
-		h.button.connect("pressed", func(): _skill_select_area(h.skill))
+	ui_control.set_skill_list(skills, _skill_select_area)
 	_back_to_skill_select()
 
 func _main_unit_skills():
@@ -96,7 +89,7 @@ func _skill_select_area(skill : Skill):
 	
 	var confirm_button = ui_control.confirm_button
 	ui_control.disconnect_all_signals_name(confirm_button, "pressed")
-	confirm_button.connect("pressed", func(): _select_area_check(skill))
+	confirm_button.connect("pressed", _select_area_check.bind(skill))
 	
 	_skill_avail_area = nav_serve.grab_skill_area(active_unit, skill)
 	battle_map.map_set_skill(_skill_avail_area)
@@ -106,13 +99,9 @@ func _highlight_the_area():
 	# Meh, its probably fast enough though.
 	_skill_aoe  = nav_serve.grab_skill_aoe (_selected_cell, _current_selected_skill)
 	battle_map.place_cast_highlighter(_skill_aoe )
-	
-func translate_to_centre(vec : Vector3):
-	return vec + battle_map.grid_translate
 
 func _skill_area_has_entity(area : Array) -> Array:
-	# TODO: Change to accept all entities
-	return units.filter(func(unit): return unit.unit_cell in area)
+	return combat_serve._units_in_area(area)
 
 func _select_area_check(skill : Skill):
 	if not _selected_cell in _skill_avail_area: print("Invalid skill select position."); return
@@ -129,9 +118,9 @@ func _select_area_check(skill : Skill):
 	
 	else:
 		# Record the skill to be cast on aoe positions.
-		var skill_to_cast = skill._obtain_cast_dict(active_unit, _skill_aoe )
+		var skill_to_cast = skill._obtain_cast_dict(active_unit, _skill_aoe)
 		combat_serve.skill_on_cast.append(skill_to_cast)
-		battle_map.add_skill_to_cast(skill_to_cast, _skill_aoe )
+		battle_map.add_skill_to_cast(skill_to_cast, _skill_aoe)
 	
 	_skill_select_inactive()
 	_unit_end_turn()
