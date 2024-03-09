@@ -11,6 +11,8 @@ var nav_cells_dict : Dictionary = {}
 var max_height : int
 var min_height : int
 
+var max_y : int
+var min_y : int
 var avail_tiles : Array
 var inverted_tiles : Array
 
@@ -150,6 +152,9 @@ func get_reachable_tiles(unit : Unit):
 		
 		avail_tiles = cell_flood_fill(tsc, mr, jr)
 		inverted_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
+		
+		max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b).y
+		min_y = avail_tiles.reduce(func(a, b): return a if a.y < b.y else b).y
 	
 	return avail_tiles
 
@@ -157,8 +162,10 @@ func get_border(avail_tiles : Array, unit : Unit):
 	var move_range = unit.attr_comp._base_attributes.MOVE
 	var jump_range = unit.attr_comp._base_attributes.JUMP
 	
-	var border_max = unit.ts_cell + Vector3i(move_range, jump_range, move_range)
-	var border_min = unit.ts_cell - Vector3i(move_range, jump_range, move_range)
+	var border_max = unit.ts_cell + Vector3i(move_range, 0, move_range)
+	var border_min = unit.ts_cell - Vector3i(move_range, 0, move_range)
+	border_max.y = max_y
+	border_min.y = min_y-1
 	
 	var MAX_HEIGHT = border_max.y+2
 	
@@ -179,7 +186,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 					is_border = true
 					break
 			
-			if is_border: break		
+			if is_border: break
 					
 					
 		if is_border:
