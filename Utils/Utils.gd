@@ -16,6 +16,11 @@ enum Orientation {NORTH, EAST, SOUTH, WEST}
 const DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 const DIAGONAL_DIRECTIONS = [Vector3i(1, 0, 1), Vector3i(1, 0, -1), Vector3i(-1, 0, 1), Vector3i(-1, 0, -1)]
 
+static func _sort_by_prediction(a : CTAttributes, b : CTAttributes):
+	if a.clock_cycles == b.clock_cycles:
+		return a.pred_ready_ct >= b.pred_ready_ct
+	return a.clock_cycles > b.clock_cycles
+
 static func create_material(color, texture=null, shaded_mode=0):
 	var material = StandardMaterial3D.new()
 	material.flags_transparent = true

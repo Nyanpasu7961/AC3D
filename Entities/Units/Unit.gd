@@ -7,11 +7,6 @@ const SPEED = 5.0
 const AUTO_SPEED = 10.0
 const JUMP_VELOCITY = 2.0
 
-var battle_map : BattleMap
-var camera_comp : CameraBody
-var nav_serve : NavService
-var ui_control : UIComponent
-
 var orientation : Utils.Orientation = Utils.Orientation.NORTH
 
 # Check if the currently controlled unit is this one.
@@ -32,20 +27,14 @@ var _next_point = Vector3i()
 const ARRIVE_DISTANCE = 0.25
 
 func _initialise_unit_mvmt(bm : BattleMap, cam : CameraBody, uc : UIComponent, ns : NavService):
-	battle_map = bm
-	camera_comp = cam
-	ui_control = uc
-	nav_serve = ns
+	_initialise_entity(bm, cam, uc, ns)
 	
 	attr_comp.initialise(self)
 	health_comp.initialise_health_comp(attr_comp, cam)
 	move_comp.initialise_move_comp(attr_comp)
 	
 	ts_cell = battle_map.local_to_map(global_position)
-	unit_cell = battle_map.local_to_map(global_position)
-
-func _process(delta):
-	pass
+	unit_cell = ts_cell
 
 func _input(event):
 	if not is_active or skill_select: return
@@ -55,8 +44,6 @@ func _input(event):
 		var mouse_tile = camera_comp.get_mouse_position()
 		if mouse_tile:
 			nav_serve.astar_unit_path(self, battle_map.l_transform_m(mouse_tile))
-
-
 
 func path_movement(delta):
 	var arrived_to_next_point = _move_to(_next_point, delta)
@@ -100,6 +87,9 @@ func _move_to(local_position, delta):
 	var norm = max(abs(res.x),abs(res.z))
 	
 	return norm <= ARRIVE_DISTANCE
+
+func get_gravity() -> float:
+	return height_scale*(move_comp.jump_gravity if velocity.y > 0 else move_comp.fall_gravity)
 
 func check_input():
 	# Get the input direction and handle the movement/deceleration.

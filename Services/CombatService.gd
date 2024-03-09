@@ -60,11 +60,6 @@ func set_active_unit(unit : Unit):
 	unit._start_turn()
 	change_active = false
 
-func _sort_by_prediction(a : CTAttributes, b : CTAttributes):
-	if a.clock_cycles == b.clock_cycles:
-		return a.pred_ready_ct >= b.pred_ready_ct
-	return a.clock_cycles > b.clock_cycles
-
 #func temp_pred_sort(a : TempPredHolder, b : TempPredHolder):
 #	
 		
@@ -74,7 +69,7 @@ func obtain_timeclock_pred():
 	var ready_pred = units.map(func (x): return x._obtain_predicted())
 	var ready_s_pred = skill_on_cast.map(func(x): return x._obtain_predicted())
 	ready_pred.append_array(ready_s_pred)
-	ready_pred.sort_custom(_sort_by_prediction)
+	ready_pred.sort_custom(Utils._sort_by_prediction)
 	return ready_pred
 
 func check_active_units():
@@ -104,10 +99,12 @@ func combat_progression():
 				
 			if entity is SkillCast:
 				var apply_aoe = unit_holder._skill_area_has_entity(entity._aoe)
-				for cell in apply_aoe:
-					cell.deal_damage(50)
 				battle_map.rm_skill_to_cast(entity)
 				skill_on_cast.erase(entity)
+				
+				
+				for cell in apply_aoe:
+					cell.deal_damage(50)
 				
 			# Need to recheck active units in case units' CT has been changed
 			ready_entities = check_active_units()

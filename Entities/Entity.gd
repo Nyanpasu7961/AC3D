@@ -5,10 +5,20 @@ extends CharacterBody3D
 @export var move_comp : MoveComponent
 @export var attr_comp : EntityParameters
 
+var battle_map : BattleMap
+var camera_comp : CameraBody
+var nav_serve : NavService
+var ui_control : UIComponent
+
 var height_scale : float = 1
 
-func get_gravity() -> float:
-	return height_scale*(move_comp.jump_gravity if velocity.y > 0 else move_comp.fall_gravity)
+func _initialise_entity(bm : BattleMap, cam : CameraBody, uc : UIComponent, ns : NavService):
+	battle_map = bm
+	camera_comp = cam
+	ui_control = uc
+	nav_serve = ns
+
+
 
 func deal_damage(dmg : float):
 	print("ouch")

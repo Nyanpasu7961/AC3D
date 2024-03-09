@@ -37,8 +37,10 @@ func _adjust_healthbar():
 	bar_sprite.position = bar_pos.rotated(Vector3.UP, rot_y)
 
 func _process(delta):
+	_adjust_healthbar()
 	if hp_changed:
 		# TODO: Put decrease health animation here.
+		# Naive implementation here, use animation nodes.
 		if hp_bar.value > curr_hp:
 			hp_bar.value = max(curr_hp, hp_bar.value-DECREASE_RATE*damage_taken)
 		else:
