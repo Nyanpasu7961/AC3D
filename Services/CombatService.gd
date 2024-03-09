@@ -84,6 +84,7 @@ func combat_progression():
 	while true:
 		# Time-based triggers resolve here eg. Quicken/Stop
 		increment_clocktime()
+		obtain_timeclock_pred()
 		# Check all units and skills with >= 100CT in decreasing order.
 		var ready_entities = check_active_units()
 		

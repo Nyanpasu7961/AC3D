@@ -11,6 +11,9 @@ var nav_cells_dict : Dictionary = {}
 var max_height : int
 var min_height : int
 
+var avail_tiles : Array
+var inverted_tiles : Array
+
 var turn_changed = true
 
 func _init_nav_serve(bm : BattleMap):
@@ -134,14 +137,14 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 	
 	# Flood fill algorithm
 	var avail_tiles = cell_flood_fill(tsc, mr, jr)
-	
-	if inverted:
-		avail_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
+	inverted_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
 	
 	return avail_tiles
 
 func _check_dict_has_tile(new_t):
-	return nav_cells_dict.has(new_t.x) and nav_cells_dict[new_t.x].has(new_t.z)
+	if nav_cells_dict.has(new_t.x) and nav_cells_dict[new_t.x].has(new_t.z):
+		return nav_cells_dict[new_t.x][new_t.z]
+	return []
 
 
 func get_border(avail_tiles : Array, unit : Unit):
@@ -151,8 +154,37 @@ func get_border(avail_tiles : Array, unit : Unit):
 	var border_max = unit.ts_cell + Vector3i(move_range, jump_range, move_range)
 	var border_min = unit.ts_cell - Vector3i(move_range, jump_range, move_range)
 	
+	var MAX_HEIGHT = border_max.y+2
+	
 	var unique_borders = []
 	
+	for t in inverted_tiles:
+		var is_border = false
+		
+		for dir in Utils.DIRECTIONSi:
+			var new_t = t + dir
+			var nav_res = _check_dict_has_tile(new_t).map(func(h): return Vector3i(new_t.x, h, new_t.z))
+			
+			for vec in nav_res:
+				
+				if vec in avail_tiles:
+					is_border = true
+					break
+			
+			if is_border: break		
+					
+					
+		if is_border:
+			var border_height = MAX_HEIGHT
+			var nav_res = _check_dict_has_tile(t)
+			nav_res = nav_res.filter(func(tile): return tile > t.y)
+			if not nav_res.is_empty():
+				border_height = nav_res.front()
+				
+			var border_res = range(t.y, border_height).map(func(h): return Vector3i(t.x, h, t.z))
+			unique_borders.append_array(border_res)
+	
+	# After checking boundary, check possible border tiles not defined on the map.
 	for t in avail_tiles:
 		for dir in Utils.DIRECTIONSi:
 			var new_t = t + dir
@@ -163,17 +195,17 @@ func get_border(avail_tiles : Array, unit : Unit):
 				continue
 			
 			## IMPORTANT: This assumes nav_cells is y-sorted in descending order.
-			var MAX_ABOVE = border_max.y+2
-			var nav_res = []
-			
-			if _check_dict_has_tile(new_t):
-				nav_res = nav_cells_dict[new_t.x][new_t.z]
+			var border_height = MAX_HEIGHT
+			var nav_res = _check_dict_has_tile(new_t)
+			# Tile to be checked, varying y-coordinate during validation.
+			var check_t = new_t
 			
 			# Check: given a border tile, is there a highlighted tile below it?
 			# Stop if there is nav tile on check.
 			var nav_below = nav_res.filter(func(x): return x < new_t.y)
 			if not nav_below.is_empty():
-				var check_t = Vector3i(new_t.x, nav_below.front(), new_t.z)
+				var check_below = nav_below.front()
+				check_t.y = check_below
 				if check_t in avail_tiles:
 					continue
 				
@@ -181,12 +213,14 @@ func get_border(avail_tiles : Array, unit : Unit):
 			var nav_above = nav_res.filter(func(x): return x > new_t.y)
 			if not nav_above.is_empty():
 				var check_above = nav_above.back()
-				if Vector3i(new_t.x, check_above, new_t.z) in avail_tiles:
-					MAX_ABOVE = check_above
+				check_t.y = check_above
+				if check_t in avail_tiles:
+					border_height = check_above
 				
-			for h in range(new_t.y, MAX_ABOVE):
-				unique_borders.append(Vector3i(new_t.x, h, new_t.z))
-				
+			var border_res = range(new_t.y, border_height).map(func(h): return Vector3i(new_t.x, h, new_t.z))
+			unique_borders.append_array(border_res)
+		
+	## Create the square ceiling and floor of the border.
 	for x in range(border_min.x, border_max.x+1):
 		for z in range(border_min.z, border_max.z+1):
 			unique_borders.append_array([Vector3i(x, border_min.y, z), Vector3i(x, border_max.y+2, z)])
@@ -247,8 +281,7 @@ func astar_reachable_tiles(unit : Unit):
 	# Re-enable all previously disabled tiles.
 	_astar_map.enable_all_disable()
 	
-	var invert_avail_tiles = get_reachable_tiles(unit, true)
-	for t in invert_avail_tiles:
+	for t in inverted_tiles:
 		_astar_map.disable_pt(t)
 	
 

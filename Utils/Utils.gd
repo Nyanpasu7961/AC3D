@@ -17,9 +17,9 @@ const DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.L
 const DIAGONAL_DIRECTIONS = [Vector3i(1, 0, 1), Vector3i(1, 0, -1), Vector3i(-1, 0, 1), Vector3i(-1, 0, -1)]
 
 static func _sort_by_prediction(a : CTAttributes, b : CTAttributes):
-	if a.clock_cycles == b.clock_cycles:
-		return a.pred_ready_ct >= b.pred_ready_ct
-	return a.clock_cycles > b.clock_cycles
+	if a._clock_cycles == b._clock_cycles:
+		return a._pred_ready_ct >= b._pred_ready_ct
+	return a._clock_cycles > b._clock_cycles
 
 static func create_material(color, texture=null, shaded_mode=0):
 	var material = StandardMaterial3D.new()
