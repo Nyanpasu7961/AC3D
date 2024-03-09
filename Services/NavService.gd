@@ -7,29 +7,40 @@ var _astar_map = AStarCustom.new()
 var _path : PackedVector3Array
 
 var nav_cells : Array
+var nav_cells_dict : Dictionary = {}
 var max_height : int
 var min_height : int
 
 var turn_changed = true
 
-var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
-
 func _init_nav_serve(bm : BattleMap):
 	battle_map = bm
-	nav_cells = get_viewable_tiles()
+	get_viewable_tiles()
 	initialise_astar()
 
-func sort_y_descend(a, b):
+func sort_y_descend(a : Vector3i, b : Vector3i):
 	return a.y > b.y
+
+func _create_nav_dict():
+	for cell in nav_cells:
+		if not nav_cells_dict.has(cell.x):
+			nav_cells_dict[cell.x] = {}
+		if not nav_cells_dict[cell.x].has(cell.z):
+			nav_cells_dict[cell.x][cell.z] = []
+			
+		nav_cells_dict[cell.x][cell.z].append(cell.y)
 
 func get_viewable_tiles():
 	var cells = battle_map.get_used_cells().map(func (x): return x + Vector3i.UP)
-	cells.sort_custom(sort_y_descend)
+	cells.sort_custom(func(a, b): return a.y > b.y)
+	
 	
 	# Remove tiles that have a block above them.
 	nav_cells = cells.filter(func (x): return (x + Vector3i.UP) not in cells)
 	max_height = cells[0].y
 	min_height = cells[cells.size()-1].y
+	
+	_create_nav_dict()
 	
 	battle_map.nav_cells = nav_cells
 	return nav_cells
@@ -129,12 +140,13 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 	
 	return avail_tiles
 
+func _check_dict_has_tile(new_t):
+	return nav_cells_dict.has(new_t.x) and nav_cells_dict[new_t.x].has(new_t.z)
+
 
 func get_border(avail_tiles : Array, unit : Unit):
 	var move_range = unit.attr_comp._base_attributes.MOVE
 	var jump_range = unit.attr_comp._base_attributes.JUMP
-	
-	#var max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b)
 	
 	var border_max = unit.ts_cell + Vector3i(move_range, jump_range, move_range)
 	var border_min = unit.ts_cell - Vector3i(move_range, jump_range, move_range)
@@ -142,7 +154,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 	var unique_borders = []
 	
 	for t in avail_tiles:
-		for dir in DIRECTIONSi:
+		for dir in Utils.DIRECTIONSi:
 			var new_t = t + dir
 			
 			if new_t in avail_tiles:
@@ -150,27 +162,34 @@ func get_border(avail_tiles : Array, unit : Unit):
 			if new_t in unique_borders:
 				continue
 			
+			## IMPORTANT: This assumes nav_cells is y-sorted in descending order.
+			var MAX_ABOVE = border_max.y+2
+			var nav_res = []
+			
+			if _check_dict_has_tile(new_t):
+				nav_res = nav_cells_dict[new_t.x][new_t.z]
+			
 			# Check: given a border tile, is there a highlighted tile below it?
 			# Stop if there is nav tile on check.
-			var tile_below = false
-			for h in range(new_t.y, border_min.y, -1):
-				var check_t = Vector3i(new_t.x, h, new_t.z)
+			var nav_below = nav_res.filter(func(x): return x < new_t.y)
+			if not nav_below.is_empty():
+				var check_t = Vector3i(new_t.x, nav_below.front(), new_t.z)
 				if check_t in avail_tiles:
-					tile_below = true
-					break
-				if check_t in nav_cells:
-					break
-			if tile_below: continue
-			
-			for h in range(new_t.y, border_max.y+2):
-				new_t.y = h
-				if new_t in avail_tiles: break
-				unique_borders.append(new_t)
-	
+					continue
+				
+			# Check for tile above.
+			var nav_above = nav_res.filter(func(x): return x > new_t.y)
+			if not nav_above.is_empty():
+				var check_above = nav_above.back()
+				if Vector3i(new_t.x, check_above, new_t.z) in avail_tiles:
+					MAX_ABOVE = check_above
+				
+			for h in range(new_t.y, MAX_ABOVE):
+				unique_borders.append(Vector3i(new_t.x, h, new_t.z))
+				
 	for x in range(border_min.x, border_max.x+1):
 		for z in range(border_min.z, border_max.z+1):
-			unique_borders.append(Vector3i(x, border_min.y, z))
-			unique_borders.append(Vector3i(x, border_max.y+2, z))
+			unique_borders.append_array([Vector3i(x, border_min.y, z), Vector3i(x, border_max.y+2, z)])
 			
 	return unique_borders
 
@@ -205,7 +224,7 @@ func initialise_astar():
 			blocked_height = h
 			break
 		
-		for d in DIRECTIONSi:
+		for d in Utils.DIRECTIONSi:
 			var new_t = t + d
 			
 			# Grab all blocks higher than current tile, not exceeding or equal to blocked_height-1
