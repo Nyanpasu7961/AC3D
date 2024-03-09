@@ -24,6 +24,17 @@ func _init_nav_serve(bm : BattleMap):
 func sort_y_descend(a : Vector3i, b : Vector3i):
 	return a.y > b.y
 
+### Creates a semi-pillar starting from t.y up to y_max or at the defined heights.
+func _pillar_generate(t: Vector3i, threshold : int, heights : Array = []) -> Array:
+	if heights.is_empty():
+		return range(t.y, threshold).map(func(h): return Vector3i(t.x, h, t.z))
+	return heights.map(func(h): return Vector3i(t.x, h, t.z))
+
+func _check_dict_has_tile(new_t : Vector3i) -> Array:
+	if nav_cells_dict.has(new_t.x) and nav_cells_dict[new_t.x].has(new_t.z):
+		return nav_cells_dict[new_t.x][new_t.z]
+	return []
+
 func _create_nav_dict():
 	for cell in nav_cells:
 		if not nav_cells_dict.has(cell.x):
@@ -87,11 +98,12 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 		result[curr_cell] = steps
 		
 		# Obtain maximum height that can be jumped to.
-		var blocked_jump = min(max_height-curr_cell.y, jump_range)
-		for h in range(2, blocked_jump):
-			if curr_cell + h*Vector3i.UP in nav_cells:
-				blocked_jump = h-1
-				break
+		var blocked_jump = min(max_height, curr_cell.y+jump_range)
+		## Assumes list is y-sorted descending.
+		var nav_above = _check_dict_has_tile(curr_cell).filter(func(h): return h > curr_cell.y)
+		
+		if not nav_above.is_empty():
+			blocked_jump = min(blocked_jump, nav_above.back()-1)
 		
 		# Go in the forced direction if this is the first step.
 		var dir_to_check = [fc.forced_direction] if check_cross and steps > 0 else directions
@@ -114,38 +126,32 @@ func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, d
 	var new_t = curr_cell + dir
 	var to_push_queue = []
 	
-	for h in range(0, blocked_jump+1):
-		var added_cell = new_t + h*Vector3i.UP
-		var new_fc = FloodCell.new(added_cell, steps+1)
-		to_push_queue.push_back(new_fc)
-			
-	for h in range(0, -jump_range-1, -1):
-		var added_cell = new_t + h*Vector3i.UP
-				
-		if added_cell in nav_cells:
-			var new_fc = FloodCell.new(added_cell, steps+1)
-			to_push_queue.push_back(new_fc)
+	# Generate all possible jumps within new_t (x, z)-coordinates.
+	var meow = _pillar_generate(new_t, blocked_jump+1).map(func(x): return FloodCell.new(x, steps+1))
+	to_push_queue.append_array(meow)
+	
+	# Generate highest fall within new_t (x, z)-coordinates.
+	var nav_res = _check_dict_has_tile(new_t).filter(func(h): return h < new_t.y and new_t.y - h < jump_range)
+	if not nav_res.is_empty():
+		new_t.y = nav_res.front()
+		var new_fc = FloodCell.new(new_t, steps+1)
+		to_push_queue.append(new_fc)
 	
 	return to_push_queue
 
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
-func get_reachable_tiles(unit : Unit, inverted : bool = false):
-	var tsc = battle_map.local_to_map(unit.ts_cell)
-	var mr = unit.attr_comp._base_attributes.MOVE
-	var jr = unit.attr_comp._base_attributes.JUMP
-	
+func get_reachable_tiles(unit : Unit):
 	# Flood fill algorithm
-	var avail_tiles = cell_flood_fill(tsc, mr, jr)
-	inverted_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
+	if turn_changed:
+		var tsc = battle_map.local_to_map(unit.ts_cell)
+		var mr = unit.attr_comp._base_attributes.MOVE
+		var jr = unit.attr_comp._base_attributes.JUMP
+		
+		avail_tiles = cell_flood_fill(tsc, mr, jr)
+		inverted_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
 	
 	return avail_tiles
-
-func _check_dict_has_tile(new_t):
-	if nav_cells_dict.has(new_t.x) and nav_cells_dict[new_t.x].has(new_t.z):
-		return nav_cells_dict[new_t.x][new_t.z]
-	return []
-
 
 func get_border(avail_tiles : Array, unit : Unit):
 	var move_range = unit.attr_comp._base_attributes.MOVE
@@ -163,10 +169,12 @@ func get_border(avail_tiles : Array, unit : Unit):
 		
 		for dir in Utils.DIRECTIONSi:
 			var new_t = t + dir
-			var nav_res = _check_dict_has_tile(new_t).map(func(h): return Vector3i(new_t.x, h, new_t.z))
+			
+			var new_heights = _check_dict_has_tile(new_t)
+			if new_heights.is_empty(): continue
+			var nav_res = _pillar_generate(new_t, 0, new_heights)
 			
 			for vec in nav_res:
-				
 				if vec in avail_tiles:
 					is_border = true
 					break
@@ -181,7 +189,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 			if not nav_res.is_empty():
 				border_height = nav_res.front()
 				
-			var border_res = range(t.y, border_height).map(func(h): return Vector3i(t.x, h, t.z))
+			var border_res = _pillar_generate(t, border_height)
 			unique_borders.append_array(border_res)
 	
 	# After checking boundary, check possible border tiles not defined on the map.
@@ -217,7 +225,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 				if check_t in avail_tiles:
 					border_height = check_above
 				
-			var border_res = range(new_t.y, border_height).map(func(h): return Vector3i(new_t.x, h, new_t.z))
+			var border_res = _pillar_generate(new_t, border_height)
 			unique_borders.append_array(border_res)
 		
 	## Create the square ceiling and floor of the border.
@@ -280,7 +288,6 @@ func initialise_astar():
 func astar_reachable_tiles(unit : Unit):
 	# Re-enable all previously disabled tiles.
 	_astar_map.enable_all_disable()
-	
 	for t in inverted_tiles:
 		_astar_map.disable_pt(t)
 	
