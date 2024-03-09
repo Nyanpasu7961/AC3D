@@ -37,6 +37,7 @@ func _check_dict_has_tile(new_t : Vector3i) -> Array:
 		return nav_cells_dict[new_t.x][new_t.z]
 	return []
 
+## Construct nav_cells in dictionary form. y-sorted descending by get_viewable_tiles().
 func _create_nav_dict():
 	for cell in nav_cells:
 		if not nav_cells_dict.has(cell.x):
@@ -49,7 +50,6 @@ func _create_nav_dict():
 func get_viewable_tiles():
 	var cells = battle_map.get_used_cells().map(func (x): return x + Vector3i.UP)
 	cells.sort_custom(func(a, b): return a.y > b.y)
-	
 	
 	# Remove tiles that have a block above them.
 	nav_cells = cells.filter(func (x): return (x + Vector3i.UP) not in cells)
@@ -141,6 +141,9 @@ func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, d
 	
 	return to_push_queue
 
+const MAP_Y_MAX = 100000
+const MAP_Y_MIN = -100000
+
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
 func get_reachable_tiles(unit : Unit):
@@ -153,8 +156,13 @@ func get_reachable_tiles(unit : Unit):
 		avail_tiles = cell_flood_fill(tsc, mr, jr)
 		inverted_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
 		
-		max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b).y
-		min_y = avail_tiles.reduce(func(a, b): return a if a.y < b.y else b).y
+		# Obtain border heights.
+		max_y = MAP_Y_MIN
+		min_y = MAP_Y_MAX
+		
+		for tile in avail_tiles:
+			max_y = max(max_y, tile.y)
+			min_y = min(min_y, tile.y)
 	
 	return avail_tiles
 
@@ -171,6 +179,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 	
 	var unique_borders = []
 	
+	## Check adjacency of non-available to determine if they are borders.
 	for t in inverted_tiles:
 		var is_border = false
 		
@@ -199,7 +208,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 			var border_res = _pillar_generate(t, border_height)
 			unique_borders.append_array(border_res)
 	
-	# After checking boundary, check possible border tiles not defined on the map.
+	## After checking boundary, check possible border tiles not defined on the map.
 	for t in avail_tiles:
 		for dir in Utils.DIRECTIONSi:
 			var new_t = t + dir
@@ -228,6 +237,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 			var nav_above = nav_res.filter(func(x): return x > new_t.y)
 			if not nav_above.is_empty():
 				var check_above = nav_above.back()
+				
 				check_t.y = check_above
 				if check_t in avail_tiles:
 					border_height = check_above
@@ -264,32 +274,29 @@ func initialise_astar():
 		
 		# Get lowest block above current tile.
 		var blocked_height = max_height+1
-		var curr_tile = Vector3(t.x, 0, t.z)
-		
-		for h in range(t.y+1, max_height+1):
-			curr_tile.y = h
-			var id2 = _astar_map.get_pointid(curr_tile)
-			if !_astar_map.has_point(id2): continue
-			blocked_height = h
-			break
+		## Relies on y-sorted dictionary.
+		# Obtain all tiles at (x, .., z) above t.
+		var nav_above = _check_dict_has_tile(t).filter(func(x): return x > t.y)
+		# Obtains lowest out of all filtered blocks.
+		if not nav_above.is_empty():
+			blocked_height = nav_above.back()
 		
 		for d in Utils.DIRECTIONSi:
 			var new_t = t + d
 			
-			# Grab all blocks higher than current tile, not exceeding or equal to blocked_height-1
-			for h in range(t.y+1, blocked_height-1):
+			# Grab all blocks higher or equal to current tile, not exceeding or equal to blocked_height-1
+			var new_nav_above = _check_dict_has_tile(new_t).filter(func(x): return x >= new_t.y and x < blocked_height)
+			for h in new_nav_above:
 				new_t.y = h
 				var id2 = _astar_map.get_pointid(new_t)
-				if !_astar_map.has_point(id2): continue
 				_astar_map.connect_points(id, id2)
 			
 			# Grab highest block from below current tile.
-			for h in range(t.y, -1, -1):
-				new_t.y = h
+			var new_nav_below = _check_dict_has_tile(new_t).filter(func(x): return x < new_t.y)
+			if not new_nav_below.is_empty():
+				new_t.y = new_nav_below.front()
 				var id2 = _astar_map.get_pointid(new_t)
-				if !_astar_map.has_point(id2): continue
 				_astar_map.connect_points(id, id2)
-				break
 		
 
 func astar_reachable_tiles(unit : Unit):

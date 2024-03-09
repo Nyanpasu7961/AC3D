@@ -114,6 +114,7 @@ func _lerp_to_zero():
 	velocity.z = move_toward(velocity.z, 0, SPEED)
 
 func _physics_process(delta):
+	if not battle_map is BattleMap: return
 	if skill_select: return
 	
 	if not path_stack.is_empty():
