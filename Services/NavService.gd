@@ -107,25 +107,25 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 		if not nav_above.is_empty():
 			blocked_jump = min(blocked_jump, nav_above.back()-1)
 		
-		# Go in the forced direction if this is the first step.
+		# Go in forced direction if floodtype is a CROSS.
+		# Exception for first step, need to initialise direction for future steps.
 		var dir_to_check = [fc.forced_direction] if check_cross and steps > 0 else directions
 		
 		# Flood to adjacent cells directed by dir_to_check
 		for dir in dir_to_check:
-			cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir)
+			var new_t = curr_cell + dir
+			cells_to_check = flood_helper(new_t, steps, blocked_jump, jump_range)
 			if check_cross:
-				cells_to_check = add_cross_attribute(cells_to_check, dir)		
+				cells_to_check = add_cross_attribute(cells_to_check, dir)
 			queue.append_array(cells_to_check)
 		
 	return result.keys()
 
 func add_cross_attribute(to_check : Array, dir : Vector3i):
 	return to_check.map(func(cell): 
-		cell.forced_direction = dir
-		return cell)
+		cell.forced_direction = dir; return cell)
 
-func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, dir):
-	var new_t = curr_cell + dir
+func flood_helper(new_t : Vector3i, steps : int, blocked_jump : int, jump_range: int):
 	var to_push_queue = []
 	
 	# Generate all possible jumps within new_t (x, z)-coordinates.
@@ -141,12 +141,13 @@ func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, d
 	
 	return to_push_queue
 
+## For defining movement borders.
 const MAP_Y_MAX = 100000
 const MAP_Y_MIN = -100000
 
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
-func get_reachable_tiles(unit : Unit):
+func get_reachable_tiles(unit : Unit) -> Array:
 	# Flood fill algorithm
 	if turn_changed:
 		var tsc = battle_map.local_to_map(unit.ts_cell)
@@ -202,8 +203,9 @@ func get_border(avail_tiles : Array, unit : Unit):
 			var border_height = MAX_HEIGHT
 			var nav_res = _check_dict_has_tile(t)
 			nav_res = nav_res.filter(func(tile): return tile > t.y)
+			
 			if not nav_res.is_empty():
-				border_height = nav_res.front()
+				border_height = nav_res.front()-2
 				
 			var border_res = _pillar_generate(t, border_height)
 			unique_borders.append_array(border_res)

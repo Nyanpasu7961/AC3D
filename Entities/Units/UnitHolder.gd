@@ -1,9 +1,10 @@
 class_name UnitHolder
 extends Node3D
 
-# Used as an API to obtain unit skills and attributes
-# Responsible for holding which units are active or not and are in battle.
-# All entities (incl. enemies) with attribute components are called Units.
+## Used as an API to obtain unit skills and attributes.
+## The middleman between the UI control and unit characters.
+## Responsible for holding which units are active or not and are in battle.
+## All entities (incl. enemies) with attribute components are called Units.
 
 var ui_control : UIComponent = null
 var combat_serve : CombatService = null

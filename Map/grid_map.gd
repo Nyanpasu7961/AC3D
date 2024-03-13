@@ -21,14 +21,13 @@ var nav_cells = []
 var max_height : int
 var min_height : int
 
-var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
-
 var grid_translate = Vector3(cell_size.x/2, 0, cell_size.z/2)
 var hover_translate = Vector3.UP*0.02
 
 func tile_translate(tile : Vector3, grab_center : bool = true):
 	var res = snapped(tile-grid_translate, cell_size)
-	if grab_center: res += grid_translate
+	if grab_center: 
+		return res + grid_translate
 	return res
 
 func set_hover(tile : Vector3):

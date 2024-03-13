@@ -27,7 +27,8 @@ func _clocktime_ready():
 
 # Obtain the amount of clock cycles needed to ready _skill
 func _obtain_predicted():
-	return _ct_attributes._obtain_predicted_clocktime()
+	_ct_attributes._obtain_predicted_clocktime()
+	return _ct_attributes
 
 func _apply_skill():
 	pass

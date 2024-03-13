@@ -7,7 +7,7 @@ var _entity_id : int = 0
 @export var _sub_job : Job
 @export var _base_attributes : Attributes
 
-var ct_attributes : CTAttributes = null
+var _ct_attributes : CTAttributes = null
 
 var _stat_mods : Array[AttrMod]
 var _collated_mods : Dictionary
@@ -15,22 +15,22 @@ var _collated_mods : Dictionary
 var _is_dirty : bool = true
 var final_stats
 
-func initialise(entity):
-	ct_attributes = CTAttributes.new(entity)
-	ct_attributes.set_clocktime_add(_base_attributes.AGI*0.1)
+func initialise(entity) -> void:
+	_ct_attributes = CTAttributes.new(entity)
+	_ct_attributes.set_clocktime_add(_base_attributes.AGI*0.1)
 
-func _clocktime_ready():
-	return ct_attributes._clocktime_ready()
+func _clocktime_ready() -> bool:
+	return _ct_attributes._clocktime_ready()
 
-func set_clocktime(ct : float):
-	ct_attributes.set_clocktime_add(ct)
+func set_clocktime(ct : float) -> void:
+	_ct_attributes.set_clocktime_add(ct)
 
-func _obtain_predicted_clocktime():
-	ct_attributes._obtain_predicted_clocktime()
-	return ct_attributes
+func _obtain_predicted_clocktime() -> CTAttributes:
+	_ct_attributes._obtain_predicted_clocktime()
+	return _ct_attributes
 
 func tick_clock_time() -> void:
-	ct_attributes.tick_clock_time()
+	_ct_attributes.tick_clock_time()
 
 func add_modifier(mod : AttrMod) -> void:
 	_is_dirty = true

@@ -26,7 +26,7 @@ var skill_on_cast = []
 func _units_in_area(area : Array) -> Array:
 	return units.filter(func(unit): return unit.ts_cell in area)
 
-func add_units(us : Array):
+func add_units(us : Array) -> void:
 	units.append_array(us)
 
 func initialise_combat_serve(ns : NavService, bm : BattleMap, uh : UnitHolder):
@@ -84,7 +84,6 @@ func combat_progression():
 	while true:
 		# Time-based triggers resolve here eg. Quicken/Stop
 		increment_clocktime()
-		obtain_timeclock_pred()
 		# Check all units and skills with >= 100CT in decreasing order.
 		var ready_entities = check_active_units()
 		
@@ -110,9 +109,16 @@ func combat_progression():
 			# Need to recheck active units in case units' CT has been changed
 			ready_entities = check_active_units()
 			turn_has_ended = false
+			
+			## TODO: Tick clock cycle here.
+		
+		## TODO: Tick clock time here.
 
 func order_by_ct(u1, u2):
 	return u1._get_clocktime() > u2._get_clocktime()
+
+func increment_clockcycle():
+	return
 
 func increment_clocktime():
 	for unit : Unit in units:

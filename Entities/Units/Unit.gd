@@ -1,7 +1,9 @@
 class_name Unit
 extends Entity
 
-signal end_movement
+## Holds movement capabilities for playable characters.
+## Allows for point-and-click movement via. A* and free movement through WASD.
+## Holds wrapper functions when entity attributes are called and for turn handling.
 
 const SPEED = 5.0
 const AUTO_SPEED = 10.0
@@ -166,7 +168,7 @@ func _start_turn():
 
 func _end_turn():
 	is_active = false
-	ts_cell = unit_cell if not is_moving else path_stack[path_stack.size()-1]
+	ts_cell = unit_cell if not is_moving else (path_stack[path_stack.size()-1] as Vector3i)
 	_toggle_borders(false)
 
 func _obtain_basic_attack():
@@ -179,7 +181,7 @@ func _obtain_main_skills():
 	return attr_comp._main_job.main_skills
 
 func _end_turn_clocktime(turn_type : int):
-	attr_comp.ct_attributes.end_turn(turn_type)
+	attr_comp._ct_attributes.end_turn(turn_type)
 
 func _clocktime_ready():
 	return attr_comp._clocktime_ready()
