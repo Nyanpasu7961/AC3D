@@ -294,7 +294,7 @@ func initialise_astar():
 				_astar_map.connect_points(id, id2)
 			
 			# Grab highest block from below current tile.
-			var new_nav_below = _check_dict_has_tile(new_t).filter(func(x): return x < new_t.y)
+			var new_nav_below = _check_dict_has_tile(new_t).filter(func(x): return x <= new_t.y)
 			if not new_nav_below.is_empty():
 				new_t.y = new_nav_below.front()
 				var id2 = _astar_map.get_pointid(new_t)
