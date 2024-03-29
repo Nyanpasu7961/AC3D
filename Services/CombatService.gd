@@ -109,10 +109,6 @@ func combat_progression():
 			# Need to recheck active units in case units' CT has been changed
 			ready_entities = check_active_units()
 			turn_has_ended = false
-			
-			## TODO: Tick clock cycle here.
-		
-		## TODO: Tick clock time here.
 
 func order_by_ct(u1, u2):
 	return u1._get_clocktime() > u2._get_clocktime()

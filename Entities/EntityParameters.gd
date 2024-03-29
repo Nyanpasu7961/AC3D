@@ -9,6 +9,7 @@ var _entity_id : int = 0
 
 var _ct_attributes : CTAttributes = null
 
+# Stores AttrMod
 var _stat_mods : Array[AttrMod]
 var _collated_mods : Dictionary
 
@@ -31,6 +32,8 @@ func _obtain_predicted_clocktime() -> CTAttributes:
 
 func tick_clock_time() -> void:
 	_ct_attributes.tick_clock_time()
+	for mod in _stat_mods:
+		mod._tick_duration(Utils.DurationType.CLOCKTIME)
 
 func add_modifier(mod : AttrMod) -> void:
 	_is_dirty = true

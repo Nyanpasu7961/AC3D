@@ -40,6 +40,9 @@ static func erase_all_children(node : Node):
 		node.remove_child(n)
 		n.queue_free()
 
+static func clamp_bool(val : float, min_bound : float, max_bound : float) -> bool:
+	return val >= min_bound and val <= max_bound
+
 static func is_cross(type : AreaType) -> bool:
 	return type == AreaType.CROSS or type == AreaType.XY_CROSS
 

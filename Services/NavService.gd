@@ -72,7 +72,7 @@ class FloodCell:
 
 # Iterative flood fill algorithm
 func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int, 
-	flood_type : Utils.AreaType = Utils.AreaType.DIAMOND) -> Array:
+	flood_type : Utils.AreaType = Utils.AreaType.DIAMOND, skill_limit : bool = false) -> Array:
 	
 	var directions = Utils.get_area_directions(flood_type)
 	var check_cross = Utils.is_cross(flood_type)
@@ -81,6 +81,7 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 	
 	var queue = [fc_root]
 	var result : Dictionary = {}
+	var root_height = tile.y
 	
 	var cells_to_check : Array
 	
@@ -88,10 +89,13 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 		
 		var fc = queue.pop_front()
 		var curr_cell = fc.tile
+		
 		var steps = fc.step
 		
 		# Check if max moves exceeded.
 		if steps > move_range: continue
+		# Height limit for skills exceeded.
+		#if skill_limit and abs(curr_cell.y - root_height) > jump_range: continue
 		# Check if on map.
 		if curr_cell not in nav_cells: continue
 		# Check if current cell is allocated to the minimum number of steps.
@@ -129,11 +133,14 @@ func flood_helper(new_t : Vector3i, steps : int, blocked_jump : int, jump_range:
 	var to_push_queue = []
 	
 	# Generate all possible jumps within new_t (x, z)-coordinates.
-	var meow = _pillar_generate(new_t, blocked_jump+1).map(func(x): return FloodCell.new(x, steps+1))
+	var meow = _pillar_generate(new_t, blocked_jump+1).map(func(x): 
+		return FloodCell.new(x, steps+1))
 	to_push_queue.append_array(meow)
 	
 	# Generate highest fall within new_t (x, z)-coordinates.
-	var nav_res = _check_dict_has_tile(new_t).filter(func(h): return h < new_t.y and new_t.y - h < jump_range)
+	var nav_res = _check_dict_has_tile(new_t).filter(func(h): 
+		return Utils.clamp_bool(new_t.y-h, 0, jump_range))
+		
 	if not nav_res.is_empty():
 		new_t.y = nav_res.front()
 		var new_fc = FloodCell.new(new_t, steps+1)
@@ -255,7 +262,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 	return unique_borders
 
 func grab_skill_area(unit : Unit, skill : Skill):
-	return cell_flood_fill(unit.unit_cell, skill._range, skill._height_range)
+	return cell_flood_fill(unit.unit_cell, skill._range, skill._height_range, Utils.AreaType.DIAMOND, true)
 
 # TODO: Change to obtain highlights for different area types.
 func grab_skill_aoe(tile : Vector3i, skill : Skill):
@@ -287,7 +294,8 @@ func initialise_astar():
 			var new_t = t + d
 			
 			# Grab all blocks higher or equal to current tile, not exceeding or equal to blocked_height-1
-			var new_nav_above = _check_dict_has_tile(new_t).filter(func(x): return x >= new_t.y and x < blocked_height)
+			var new_nav_above = _check_dict_has_tile(new_t).filter(func(x): 
+				return Utils.clamp_bool(x, new_t.y, blocked_height-1))
 			for h in new_nav_above:
 				new_t.y = h
 				var id2 = _astar_map.get_pointid(new_t)
