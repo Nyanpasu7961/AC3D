@@ -26,6 +26,9 @@ func _clocktime_ready() -> bool:
 func set_clocktime(ct : float) -> void:
 	_ct_attributes.set_clocktime_add(ct)
 
+func get_clocktime() -> float:
+	return _ct_attributes._clock_time
+
 func _obtain_predicted_clocktime() -> CTAttributes:
 	_ct_attributes._obtain_predicted_clocktime()
 	return _ct_attributes

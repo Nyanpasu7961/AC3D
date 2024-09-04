@@ -191,7 +191,7 @@ func _obtain_predicted():
 	return attr_comp._obtain_predicted_clocktime()
 
 func _get_clocktime():
-	return attr_comp.ct_attributes.clock_time
+	return attr_comp.get_clocktime()
 
 func _tick_clocktime():
 	attr_comp.tick_clock_time()

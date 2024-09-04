@@ -32,6 +32,7 @@ func _pillar_generate(t: Vector3i, threshold : int, heights : Array = []) -> Arr
 		return range(t.y, threshold).map(func(h): return Vector3i(t.x, h, t.z))
 	return heights.map(func(h): return Vector3i(t.x, h, t.z))
 
+### Checks if the map contains the tile (x, y, z) and returns the heights for positions (x, _, z).
 func _check_dict_has_tile(new_t : Vector3i) -> Array:
 	if nav_cells_dict.has(new_t.x) and nav_cells_dict[new_t.x].has(new_t.z):
 		return nav_cells_dict[new_t.x][new_t.z]
@@ -72,7 +73,7 @@ class FloodCell:
 
 # Iterative flood fill algorithm
 func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int, 
-	flood_type : Utils.AreaType = Utils.AreaType.DIAMOND, skill_limit : bool = false) -> Array:
+	flood_type : Utils.AreaType = Utils.AreaType.DIAMOND, skill_limit : bool = false) -> Dictionary:
 	
 	var directions = Utils.get_area_directions(flood_type)
 	var check_cross = Utils.is_cross(flood_type)
@@ -83,8 +84,11 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 	var result : Dictionary = {}
 	var root_height = tile.y
 	
+	var border : Array = []
+	
 	var cells_to_check : Array
 	
+	## TODO: Make dictionary more efficient, make it MOVE to TILE.
 	while not queue.is_empty():
 		
 		var fc = queue.pop_front()
@@ -93,9 +97,9 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 		var steps = fc.step
 		
 		# Check if max moves exceeded.
-		if steps > move_range: continue
-		# Height limit for skills exceeded.
-		#if skill_limit and abs(curr_cell.y - root_height) > jump_range: continue
+		if steps > move_range: 
+			continue
+
 		# Check if on map.
 		if curr_cell not in nav_cells: continue
 		# Check if current cell is allocated to the minimum number of steps.
@@ -123,7 +127,7 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 				cells_to_check = add_cross_attribute(cells_to_check, dir)
 			queue.append_array(cells_to_check)
 		
-	return result.keys()
+	return result
 
 func add_cross_attribute(to_check : Array, dir : Vector3i):
 	return to_check.map(func(cell): 
@@ -161,7 +165,9 @@ func get_reachable_tiles(unit : Unit) -> Array:
 		var mr = unit.attr_comp._base_attributes.MOVE
 		var jr = unit.attr_comp._base_attributes.JUMP
 		
-		avail_tiles = cell_flood_fill(tsc, mr, jr)
+		var avail_dict = cell_flood_fill(tsc, mr, jr)
+		
+		avail_tiles = avail_dict.keys()
 		inverted_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
 		
 		# Obtain border heights.
@@ -173,6 +179,20 @@ func get_reachable_tiles(unit : Unit) -> Array:
 			min_y = min(min_y, tile.y)
 	
 	return avail_tiles
+
+
+func _obtain_border_pillar(new_t, new_heights, max_h):
+	# Generate a pillar from 0 to h
+	var nav_res = _pillar_generate(new_t, 0, new_heights)
+	
+	# Check if it is above the xz-plane new_t is being checked
+	var to_check = nav_res.filter(func(t): return t.y >= new_t.y)
+	# Check for if any point on the pillar can be reached by the player
+	var avail_heights = to_check.filter(func(t): return t in avail_tiles).map(func(t): return t.y)
+	
+	if not avail_heights.is_empty():
+		return _pillar_generate(new_t, avail_heights.min())
+	return _pillar_generate(new_t, max_h)
 
 func get_border(avail_tiles : Array, unit : Unit):
 	var move_range = unit.attr_comp._base_attributes.MOVE
@@ -187,72 +207,55 @@ func get_border(avail_tiles : Array, unit : Unit):
 	
 	var unique_borders = []
 	
-	## Check adjacency of non-available to determine if they are borders.
-	for t in inverted_tiles:
-		var is_border = false
-		
-		for dir in Utils.DIRECTIONSi:
-			var new_t = t + dir
-			
-			var new_heights = _check_dict_has_tile(new_t)
-			if new_heights.is_empty(): continue
-			var nav_res = _pillar_generate(new_t, 0, new_heights)
-			
-			for vec in nav_res:
-				if vec in avail_tiles:
-					is_border = true
-					break
-			
-			if is_border: break
-					
-					
-		if is_border:
-			var border_height = MAX_HEIGHT
-			var nav_res = _check_dict_has_tile(t)
-			nav_res = nav_res.filter(func(tile): return tile > t.y)
-			
-			if not nav_res.is_empty():
-				border_height = nav_res.front()-2
-				
-			var border_res = _pillar_generate(t, border_height)
-			unique_borders.append_array(border_res)
+	var pillar : Array
 	
-	## After checking boundary, check possible border tiles not defined on the map.
+	## Check adjacency of non-available to determine if they are borders.
 	for t in avail_tiles:
 		for dir in Utils.DIRECTIONSi:
-			var new_t = t + dir
+			var new_t = t+dir
 			
-			if new_t in avail_tiles:
+			# If it is an available tile, it is not a border.
+			if new_t in avail_tiles: 
 				continue
-			if new_t in unique_borders:
+			
+			# Check for all heights at the x, z position on the map.
+			# NOT FOR CHECKING AVAILABLE TILES.
+			var new_heights = _check_dict_has_tile(new_t)
+			
+			# If there are no other tiles at the x, z position, generate a pillar up to the ceiling.
+			if new_heights.is_empty():
+				pillar = _pillar_generate(new_t, MAX_HEIGHT)
+				unique_borders.append_array(pillar)
 				continue
 			
-			## IMPORTANT: This assumes nav_cells is y-sorted in descending order.
-			var border_height = MAX_HEIGHT
-			var nav_res = _check_dict_has_tile(new_t)
-			# Tile to be checked, varying y-coordinate during validation.
-			var check_t = new_t
-			
-			# Check: given a border tile, is there a highlighted tile below it?
-			# Stop if there is nav tile on check.
-			var nav_below = nav_res.filter(func(x): return x < new_t.y)
-			if not nav_below.is_empty():
-				var check_below = nav_below.front()
-				check_t.y = check_below
-				if check_t in avail_tiles:
+			# If there are but new_t itself is not on the map,
+			# - If there are available tiles below, do nothing.
+			# - Otherwise, bound pillar with the lowest higher bound.
+			elif new_t not in nav_cells:
+				var bound_height : int
+				# Get available tiles at xz-position of new_t
+				var avail_new_t = _pillar_generate(new_t, 0, new_heights).filter(func(t): return t in avail_tiles)
+				# No available tiles at position implies 
+				if avail_new_t.is_empty(): 
+					bound_height = MAX_HEIGHT
 					continue
 				
-			# Check for tile above.
-			var nav_above = nav_res.filter(func(x): return x > new_t.y)
-			if not nav_above.is_empty():
-				var check_above = nav_above.back()
+				# Convert to a height array.
+				var avail_heights = avail_new_t.map(func(t): return t.y)
+				# If available tiles are below, do nothing.
+				if avail_heights.min() < new_t.y: continue
 				
-				check_t.y = check_above
-				if check_t in avail_tiles:
-					border_height = check_above
+				# Check the boundary of the pillar to be generated.
+				var above_heights = new_heights.filter(func(h): return h > new_t.y)
+				bound_height = MAX_HEIGHT if above_heights.is_empty() else above_heights.min()-1
+					
 				
-			var border_res = _pillar_generate(new_t, border_height)
-			unique_borders.append_array(border_res)
+				pillar = _pillar_generate(new_t, bound_height)
+				unique_borders.append_array(pillar)
+				continue
+			
+			var nav_res = _obtain_border_pillar(new_t, new_heights, MAX_HEIGHT)
+			unique_borders.append_array(nav_res)
 		
 	## Create the square ceiling and floor of the border.
 	for x in range(border_min.x, border_max.x+1):
@@ -262,11 +265,11 @@ func get_border(avail_tiles : Array, unit : Unit):
 	return unique_borders
 
 func grab_skill_area(unit : Unit, skill : Skill):
-	return cell_flood_fill(unit.unit_cell, skill._range, skill._height_range, Utils.AreaType.DIAMOND, true)
+	return cell_flood_fill(unit.unit_cell, skill._range, skill._height_range, Utils.AreaType.DIAMOND, true).keys()
 
 # TODO: Change to obtain highlights for different area types.
 func grab_skill_aoe(tile : Vector3i, skill : Skill):
-	return cell_flood_fill(tile, max(0, skill._area_length-1), skill._height_range, skill._area_type)
+	return cell_flood_fill(tile, max(0, skill._area_length-1), skill._height_range, skill._area_type).keys()
 
 func initialise_astar():
 	var tile_no = nav_cells.size()

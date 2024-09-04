@@ -47,6 +47,7 @@ func l_transform_m(cell : Vector3) -> Vector3i:
 	var map_cell = local_to_map(cell)
 	return map_cell
 
+## Maybe attempt to separate initialised borders and borders when checking turns.
 func set_border(border_tiles : Array):
 	border_map.clear()
 	for cell in border_tiles:

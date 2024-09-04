@@ -47,7 +47,9 @@ func calculate_damage(source_unit : Unit, target_unit : Unit, skill : Skill):
 func turn_start(unit : Unit):
 	var reach_tiles : Array = nav_serve.get_reachable_tiles(unit)
 	battle_map.set_movement_high(reach_tiles)
-	battle_map.set_border(nav_serve.get_border(reach_tiles, unit))
+	var border = nav_serve.get_border(reach_tiles, unit)
+	print(border)
+	battle_map.set_border(border)
 	set_active_unit(unit)
 	
 func turn_end():
@@ -61,8 +63,8 @@ func set_active_unit(unit : Unit):
 	change_active = false
 
 #func temp_pred_sort(a : TempPredHolder, b : TempPredHolder):
-#	
-		
+#
+
 # Obtains the predicted number of clock cycles required for a unit/skill to be ready.
 # This is to be displayed on UI on the top-right screen.
 func obtain_timeclock_pred():
