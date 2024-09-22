@@ -328,7 +328,6 @@ func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
 	
 	# Need to translate down given block position i.e. block is placed above grid.
 	_path = _astar_map.get_path(unit.unit_cell, pos)
-	print(_path)
 	if _path.is_empty(): return []
 	
 	unit.path_stack = _path

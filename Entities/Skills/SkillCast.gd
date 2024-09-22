@@ -14,7 +14,7 @@ func _init(s : Skill, area : Array):
 	_ct_attributes.set_clocktime_add(_skill._cast_speed)
 
 func _get_clocktime():
-	return _ct_attributes.clock_time
+	return _ct_attributes._clock_time
 
 func _get_source():
 	return _skill._source

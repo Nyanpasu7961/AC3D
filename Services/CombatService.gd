@@ -48,7 +48,6 @@ func turn_start(unit : Unit):
 	var reach_tiles : Array = nav_serve.get_reachable_tiles(unit)
 	battle_map.set_movement_high(reach_tiles)
 	var border = nav_serve.get_border(reach_tiles, unit)
-	print(border)
 	battle_map.set_border(border)
 	set_active_unit(unit)
 	
