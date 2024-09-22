@@ -5,16 +5,18 @@ var rot_displacement = PI/4
 
 const MOVE_SPEED = 16
 const ROT_SPEED = 10
-
 const RAY_LENGTH = 1000
+const FULL_ROT = 2*PI
+
+var zoom : float = 0
+@export var zoom_step : float = 0.1
+@export var ZOOM_LIMIT : int = 3
+
+var initial_cam_pos : Vector3
 
 # Holds rotation in radians
-var x_rot
-var y_rot
-
-@export var fov_step : float = 10
-@export var min_fov : float = 30
-@export var max_fov : float = 120
+var x_rot : float
+var y_rot : float
 
 var desired_fov : float
 
@@ -33,6 +35,7 @@ var target_position : Vector3
 
 func _ready():
 	desired_fov = camera.fov
+	initial_cam_pos = camera.position
 	
 	var rot = pivot.get_rotation()
 	x_rot = rot.x
@@ -45,49 +48,41 @@ func _input(event : InputEvent):
 func _process(delta):
 	rotate_camera(delta)
 	follow()
-	
-	#if ray.is_colliding():
-	#	print(ray.get_collision_point())
-	#else:
-	#	print("no")
 
 func camera_zoom(event):
 	if event.is_action("zoom_in"):
-		desired_fov -= fov_step
-		desired_fov = clamp(desired_fov, min_fov, max_fov)
-		camera.fov = desired_fov
-		
+		zoom -= zoom_step
 	elif event.is_action("zoom_out"):
-		desired_fov += fov_step
-		desired_fov = clamp(desired_fov, min_fov, max_fov)
-		camera.fov = desired_fov	
+		zoom += zoom_step
+		
+	zoom = clamp(zoom, -ZOOM_LIMIT, ZOOM_LIMIT)
+	camera.position.z = initial_cam_pos.z + zoom
 
 func camera_rot(event):
 	if event.is_action_pressed("rot_left"):
 		set_process_input(false)
 		y_rot -= rot_displacement
-		
 		if y_rot < 0:
-			y_rot += 2*PI
-			pivot.rotation.y += 2*PI
+			pivot.rotation.y += FULL_ROT
+			y_rot += FULL_ROT
 		has_moved = true
 		
 	elif event.is_action_pressed("rot_right"):
 		set_process_input(false)
 		y_rot += rot_displacement
-		if y_rot > 2*PI:
-			y_rot -= 2*PI
-			pivot.rotation.y -= 2*PI
+		if y_rot > FULL_ROT:
+			pivot.rotation.y -= FULL_ROT
+			y_rot -= FULL_ROT
 		has_moved = true
 	
 	elif event.is_action_pressed("rot_up"):
 		set_process_input(false)
-		x_rot -= rot_displacement
+		x_rot = clamp(x_rot - rot_displacement, -PI/2, 0)
 		has_moved = true
 	
 	elif event.is_action_pressed("rot_down"):
 		set_process_input(false)
-		x_rot += rot_displacement
+		x_rot = clamp(x_rot + rot_displacement, -PI/2, 0)
 		has_moved = true
 
 func move_camera(h, v, joystick):

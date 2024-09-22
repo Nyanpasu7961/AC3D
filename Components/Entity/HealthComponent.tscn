@@ -13,6 +13,7 @@ script = ExtResource("1_wjaf1")
 [node name="BarSprite" type="Sprite3D" parent="."]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 billboard = 1
+render_priority = 10
 texture = SubResource("ViewportTexture_tyjat")
 
 [node name="BarViewPort" type="SubViewport" parent="."]

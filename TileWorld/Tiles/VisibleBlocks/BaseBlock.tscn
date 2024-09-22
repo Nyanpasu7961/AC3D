@@ -1,15 +1,24 @@
-[gd_scene load_steps=4 format=3 uid="uid://c61v0m7u0ttjg"]
+[gd_scene load_steps=5 format=3 uid="uid://c61v0m7u0ttjg"]
 
-[ext_resource type="Material" uid="uid://cj0pc330h5tvp" path="res://TileWorld/Tiles/VisibleBlocks/BaseBlock.tres" id="1_ps7y3"]
+[ext_resource type="Texture2D" uid="uid://dn4gcixt1d3i0" path="res://TileAssets/grid_meow.png" id="2_a3mj0"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_eqs7c"]
-material = ExtResource("1_ps7y3")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eapxl"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+albedo_texture = ExtResource("2_a3mj0")
+uv1_triplanar = true
+distance_fade_mode = 2
+distance_fade_max_distance = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_q315i"]
+material = SubResource("StandardMaterial3D_eapxl")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_kfvsv"]
 
 [node name="BaseBlock" type="MeshInstance3D"]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0.25, -0.25, 0.25)
-mesh = SubResource("BoxMesh_eqs7c")
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+mesh = SubResource("BoxMesh_q315i")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 

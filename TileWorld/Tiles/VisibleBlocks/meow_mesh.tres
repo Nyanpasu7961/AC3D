@@ -1,0 +1,6 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://d2hrseyn7dvan"]
+
+[ext_resource type="Material" uid="uid://dp3fgotpwmv7g" path="res://TileWorld/Tiles/VisibleBlocks/shader_surface.tres" id="1_a5bt3"]
+
+[resource]
+material = ExtResource("1_a5bt3")

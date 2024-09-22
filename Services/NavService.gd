@@ -10,7 +10,7 @@ var nav_cells : Array
 var max_height : int
 var min_height : int
 
-var current_unit : Unit
+var turn_changed = true
 
 var DIRECTIONSi = [Vector3i.FORWARD, Vector3i.BACK, Vector3i.RIGHT, Vector3i.LEFT]
 
@@ -55,42 +55,51 @@ func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int,
 	var queue = [fc_root]
 	var result : Dictionary = {}
 	
+	var cells_to_check : Array
+	
 	while not queue.is_empty():
 		
 		var fc = queue.pop_front()
 		var curr_cell = fc.tile
 		var steps = fc.step
 		
+		# Check if max moves exceeded.
 		if steps > move_range: continue
+		# Check if on map.
 		if curr_cell not in nav_cells: continue
-		
-		if result.has(curr_cell):
-			if result[curr_cell] <= steps: continue
+		# Check if current cell is allocated to the minimum number of steps.
+		if result.has(curr_cell) and result[curr_cell] <= steps: continue
 		
 		result[curr_cell] = steps
 		
+		# Obtain maximum height that can be jumped to.
 		var blocked_jump = min(max_height-curr_cell.y, jump_range)
 		for h in range(2, blocked_jump):
 			if curr_cell + h*Vector3i.UP in nav_cells:
 				blocked_jump = h-1
 				break
 		
-		var cells_to_check : Array
-		if check_cross and steps > 0:
-			var dir = fc.forced_direction
-			cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir, check_cross)					
+		# Go in the forced direction if this is the first step.
+		var dir_to_check = [fc.forced_direction] if check_cross and steps > 0 else directions
+		
+		# Flood to adjacent cells directed by dir_to_check
+		for dir in dir_to_check:
+			cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir)
+			if check_cross:
+				cells_to_check = add_cross_attribute(cells_to_check, dir)		
 			queue.append_array(cells_to_check)
-		else:
-			for dir in directions:
-				cells_to_check = flood_helper(curr_cell, steps, blocked_jump, jump_range, dir, check_cross)
-				queue.append_array(cells_to_check)
 		
 	return result.keys()
 
-func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, dir, check_cross):
+func add_cross_attribute(to_check : Array, dir : Vector3i):
+	return to_check.map(func(cell): 
+		cell.forced_direction = dir
+		return cell)
+
+func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, dir):
 	var new_t = curr_cell + dir
-	
 	var to_push_queue = []
+	
 	for h in range(0, blocked_jump+1):
 		var added_cell = new_t + h*Vector3i.UP
 		var new_fc = FloodCell.new(added_cell, steps+1)
@@ -102,10 +111,6 @@ func flood_helper(curr_cell : Vector3i, steps : int, blocked_jump, jump_range, d
 		if added_cell in nav_cells:
 			var new_fc = FloodCell.new(added_cell, steps+1)
 			to_push_queue.push_back(new_fc)
-	
-	if check_cross: 
-		to_push_queue = to_push_queue.map(func(cell): 
-			cell.forced_direction = dir; return cell)
 	
 	return to_push_queue
 
@@ -120,11 +125,7 @@ func get_reachable_tiles(unit : Unit, inverted : bool = false):
 	var avail_tiles = cell_flood_fill(tsc, mr, jr)
 	
 	if inverted:
-		var invert_tiles = []
-		for t in nav_cells:
-			if t not in avail_tiles:
-				invert_tiles.append(t)
-		return invert_tiles
+		avail_tiles = nav_cells.filter(func(x): return x not in avail_tiles)
 	
 	return avail_tiles
 
@@ -133,11 +134,10 @@ func get_border(avail_tiles : Array, unit : Unit):
 	var move_range = unit.attr_comp._base_attributes.MOVE
 	var jump_range = unit.attr_comp._base_attributes.JUMP
 	
-	#TODO: Fix so that it uses the avail tiles instead of unit pos for border.
-	var max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b)
+	#var max_y = avail_tiles.reduce(func(a, b): return a if a.y > b.y else b)
 	
-	var border_max = unit.unit_cell + Vector3i(move_range, jump_range, move_range)
-	var border_min = unit.unit_cell - Vector3i(move_range, jump_range, move_range)
+	var border_max = unit.ts_cell + Vector3i(move_range, jump_range, move_range)
+	var border_min = unit.ts_cell - Vector3i(move_range, jump_range, move_range)
 	
 	var unique_borders = []
 	
@@ -234,9 +234,9 @@ func astar_reachable_tiles(unit : Unit):
 	
 
 func astar_unit_path(unit : Unit, pos : Vector3i) -> PackedVector3Array:
-	if current_unit != unit:
+	if turn_changed:
 		astar_reachable_tiles(unit)
-		current_unit = unit
+		turn_changed = false
 	
 	unit.unit_cell = battle_map.local_to_map(unit.global_position)
 	

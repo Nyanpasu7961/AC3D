@@ -4,6 +4,7 @@ extends Resource
 @export var _name : String = "None"
 @export var _description : String = "No description."
 
+var _source : Unit = null
 
 @export var _skill_type : Utils.SkillType
 @export var _weapon_type : Utils.WeaponType
@@ -41,8 +42,17 @@ extends Resource
 func has_cast():
 	return _cast_speed != 0
 
-func obtain_cast_dict(aoe : Array):
-	return {"cast_time": 0, "aoe": aoe}
+func _obtain_cast_dict(unit : Unit, aoe : Array):
+	var skill_copy : Skill = self.duplicate()
+	skill_copy._set_source(unit)
+	return SkillCastConstructor.get_instance().create_skillcast(skill_copy, aoe)
+
+func _set_source(unit : Unit):
+	_source = unit
+	for mod in _modifiers:
+		mod.source = unit
+	for status in _statuses:
+		status.source = unit
 
 # TODO: Still need to finish for damaging skill types
 #func apply_skill(target : Unit):

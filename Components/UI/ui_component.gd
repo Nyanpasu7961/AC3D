@@ -2,15 +2,15 @@ extends Control
 class_name UIComponent
 
 @onready var control_containers = $TurnUIControl
-@onready var skill_scroll = $SkillSelection/SkillScroll
-@onready var skill_list : VBoxContainer = $SkillSelection/SkillScroll/SkillList
 
 @onready var skill_selection_cont = $SkillSelection
+@onready var skill_scroll = $SkillSelection/SkillScroll
+@onready var skill_list : VBoxContainer = $SkillSelection/SkillScroll/SkillList
 @onready var confirm_container = $SkillSelection/ConfirmHBox
 @onready var confirm_button : Button = $SkillSelection/ConfirmHBox/ConfirmButton
 @onready var back_button : Button = $SkillSelection/ConfirmHBox/BackButton
 
-
+@onready var orientation_cont = $OrientationSelection
 
 func get_act(action : String = ""):
 	if action == "": return control_containers
@@ -37,20 +37,31 @@ func disconnect_all_signals_name(button : Button, method : String):
 
 func clear_skill_list():
 	for button in skill_list.get_children():
-		button.visible = false
-		disconnect_all_signals_name(button, "pressed")
+		if button.visible:
+			disconnect_all_signals_name(button, "pressed")
+			button.visible = false
 
-func set_skill_list(skills : Array):
+
+
+func set_skill_list(skills : Array, skill_func : Callable):
 	var button_pointers = []
+	var btn_count_changed = false
 	
 	var button_nodes = skill_list.get_children()
-	while button_nodes.size() < skills.size():
+	var button_count = button_nodes.size()
+	var skill_count = skills.size()
+	
+	while button_count < skill_count:
 		skill_list.add_child(Button.new())
+		button_count += 1
+		btn_count_changed = true
+		
+	if btn_count_changed:
+		button_nodes = skill_list.get_children()
+		btn_count_changed = false
 	
 	for i in range(skills.size()):
-		button_nodes[i].visible = true
-
-		button_nodes[i].text = skills[i]._name
-		button_pointers.append(ButtonHandler.new(button_nodes[i], skills[i]))
-
-	return button_pointers
+		var skill_button = button_nodes[i]
+		skill_button.visible = true
+		skill_button.text = skills[i]._name
+		skill_button.connect("pressed", skill_func.bind(skills[i]))
