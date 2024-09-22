@@ -29,6 +29,7 @@ func initialise_health_comp(ac : EntityParameters, cam : CameraBody):
 	curr_hp = max_hp
 
 func _adjust_healthbar():
+	if not camera_body is CameraBody: return
 	var cam_rot = camera_body.pivot.rotation
 	var rot_x = snapped(cam_rot.x, 0.01)
 	var rot_y = snapped(cam_rot.y, 0.01)

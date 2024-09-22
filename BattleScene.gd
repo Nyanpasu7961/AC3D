@@ -22,7 +22,3 @@ func _input(event : InputEvent):
 		var mouse_tile = camera_body.get_mouse_position()
 		if mouse_tile: 
 			battle_map.set_hover(mouse_tile)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass

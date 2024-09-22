@@ -26,7 +26,7 @@ var skill_on_cast = []
 func _units_in_area(area : Array) -> Array:
 	return units.filter(func(unit): return unit.ts_cell in area)
 
-func add_units(us : Array):
+func add_units(us : Array) -> void:
 	units.append_array(us)
 
 func initialise_combat_serve(ns : NavService, bm : BattleMap, uh : UnitHolder):
@@ -47,7 +47,9 @@ func calculate_damage(source_unit : Unit, target_unit : Unit, skill : Skill):
 func turn_start(unit : Unit):
 	var reach_tiles : Array = nav_serve.get_reachable_tiles(unit)
 	battle_map.set_movement_high(reach_tiles)
-	battle_map.set_border(nav_serve.get_border(reach_tiles, unit))
+	var border = nav_serve.get_border(reach_tiles, unit)
+	print(border)
+	battle_map.set_border(border)
 	set_active_unit(unit)
 	
 func turn_end():
@@ -61,8 +63,8 @@ func set_active_unit(unit : Unit):
 	change_active = false
 
 #func temp_pred_sort(a : TempPredHolder, b : TempPredHolder):
-#	
-		
+#
+
 # Obtains the predicted number of clock cycles required for a unit/skill to be ready.
 # This is to be displayed on UI on the top-right screen.
 func obtain_timeclock_pred():
@@ -112,6 +114,9 @@ func combat_progression():
 
 func order_by_ct(u1, u2):
 	return u1._get_clocktime() > u2._get_clocktime()
+
+func increment_clockcycle():
+	return
 
 func increment_clocktime():
 	for unit : Unit in units:

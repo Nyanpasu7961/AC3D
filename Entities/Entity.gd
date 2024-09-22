@@ -18,8 +18,6 @@ func _initialise_entity(bm : BattleMap, cam : CameraBody, uc : UIComponent, ns :
 	ui_control = uc
 	nav_serve = ns
 
-
-
 func deal_damage(dmg : float):
 	print("ouch")
 	health_comp.take_dmg(dmg)
