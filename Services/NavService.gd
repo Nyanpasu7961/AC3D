@@ -238,17 +238,16 @@ func get_border(avail_tiles : Array, unit : Unit):
 				# No available tiles at position implies 
 				if avail_new_t.is_empty(): 
 					bound_height = MAX_HEIGHT
-					continue
 				
-				# Convert to a height array.
-				var avail_heights = avail_new_t.map(func(t): return t.y)
-				# If available tiles are below, do nothing.
-				if avail_heights.min() < new_t.y: continue
-				
-				# Check the boundary of the pillar to be generated.
-				var above_heights = new_heights.filter(func(h): return h > new_t.y)
-				bound_height = MAX_HEIGHT if above_heights.is_empty() else above_heights.min()-1
+				else:
+					# Convert to a height array.
+					var avail_heights = avail_new_t.map(func(t): return t.y)
+					# If available tiles are below, do nothing.
+					if avail_heights.min() < new_t.y: continue
 					
+					# Check the boundary of the pillar to be generated.
+					var above_heights = new_heights.filter(func(h): return h > new_t.y)
+					bound_height = MAX_HEIGHT if above_heights.is_empty() else above_heights.min()-1
 				
 				pillar = _pillar_generate(new_t, bound_height)
 				unique_borders.append_array(pillar)
