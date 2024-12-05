@@ -18,6 +18,19 @@ var inverted_tiles : Array
 
 var turn_changed = true
 
+## For defining movement borders.
+const MAP_Y_MAX = 100000
+const MAP_Y_MIN = -100000
+
+class FloodCell:
+	var tile : Vector3i
+	var step : int
+	var forced_direction : Vector3i
+	
+	func _init(t, s):
+		tile = t
+		step = s
+
 func _init_nav_serve(bm : BattleMap):
 	battle_map = bm
 	get_viewable_tiles()
@@ -48,6 +61,7 @@ func _create_nav_dict():
 			
 		nav_cells_dict[cell.x][cell.z].append(cell.y)
 
+## Only used on initialisation of the battle map.
 func get_viewable_tiles():
 	var cells = battle_map.get_used_cells().map(func (x): return x + Vector3i.UP)
 	cells.sort_custom(func(a, b): return a.y > b.y)
@@ -61,15 +75,6 @@ func get_viewable_tiles():
 	
 	battle_map.nav_cells = nav_cells
 	return nav_cells
-
-class FloodCell:
-	var tile : Vector3i
-	var step : int
-	var forced_direction : Vector3i
-	
-	func _init(t, s):
-		tile = t
-		step = s
 
 # Iterative flood fill algorithm
 func cell_flood_fill(tile : Vector3i, move_range : int, jump_range : int, 
@@ -152,10 +157,6 @@ func flood_helper(new_t : Vector3i, steps : int, blocked_jump : int, jump_range:
 	
 	return to_push_queue
 
-## For defining movement borders.
-const MAP_Y_MAX = 100000
-const MAP_Y_MIN = -100000
-
 # unit: Unit on the battlemap to be queried
 # inverted : Gets all squares within unit's range if false, otherwise invert the squares if true.
 func get_reachable_tiles(unit : Unit) -> Array:
@@ -209,7 +210,7 @@ func get_border(avail_tiles : Array, unit : Unit):
 	
 	var pillar : Array
 	
-	## Check adjacency of non-available to determine if they are borders.
+	## Check adjacency of available tiles to determine if they are borders.
 	for t in avail_tiles:
 		for dir in Utils.DIRECTIONSi:
 			var new_t = t+dir
@@ -274,12 +275,12 @@ func initialise_astar():
 	var tile_no = nav_cells.size()
 	_astar_map.reserve_space(tile_no)
 
-	# Add all points to astar
+	## Add all points to astar
 	for t in nav_cells:
 		var id = _astar_map.get_pointid(t)
 		_astar_map.add_point(id, t)
 	
-	# Connect all adjacent points.
+	## Connect all adjacent points.
 	for t in nav_cells:
 		var id = _astar_map.get_pointid(t)
 		
